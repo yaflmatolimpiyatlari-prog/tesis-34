@@ -131,14 +131,14 @@
         let aktifTakim = ""; let aktifTerminal = ""; let ogrenciIsmi = ""; 
         let seciliBolge = null; let dogruCevap = ""; let isSavasBasladi = false; let isSavasBitti = false;
         let cozulmusSorular = {}; let skorDogru = 0; let skorYanlis = 0; let elendiMi = false;
-        let isGirisYapildi = false; let benimSessionToken = Math.random().toString(36).substr(2); // Mükerrer giriş engeli için
+        let isGirisYapildi = false; let benimSessionToken = Math.random().toString(36).substr(2);
+        let bolgeCanlari = {1:6, 2:6, 3:6, 4:6, 5:6, 6:6, 7:6}; // YENİ: Kalkan/Kilit Motoru için
         
         let lockInterval = null;
 
         const takimRenkleri = { takim_1: 'bg-blue-500', takim_2: 'bg-green-500', takim_3: 'bg-purple-500', takim_4: 'bg-orange-500' };
-        const takimIsimleri = ["ALFA", "BETA", "GAMA", "DELTA"];
 
-        // 1. AKILLI ŞİFRE ARAMA (Takım/Batarya Seçmek Yok!)
+        // 1. AKILLI ŞİFRE ARAMA
         function sistemeBaglan() {
             const girilenSifre = document.getElementById('ogrenci-sifre').value.trim();
             if(girilenSifre === "") { alert("Şifre boş bırakılamaz!"); return; }
@@ -151,7 +151,6 @@
                         for(let term=1; term<=6; term++) {
                             const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
                             if(ogr && ogr.sifre === girilenSifre) {
-                                // Bulundu!
                                 bulundu = true; aktifTakim = t; aktifTerminal = term;
                                 isGirisYapildi = true; ogrenciIsmi = ogr.isim;
                                 skorDogru = ogr.dogru || 0; skorYanlis = ogr.yanlis || 0;
@@ -164,24 +163,14 @@
                                 document.getElementById('karne-isim').innerText = ogrenciIsmi.toUpperCase();
                                 document.getElementById('login-screen').classList.add('hidden');
                                 
-                                // Mükerrer Giriş / Kilit Dinleyicisi
                                 userRef.on('value', snap => {
                                     const currData = snap.val();
-                                    if(currData && currData.session_token !== benimSessionToken) {
-                                        alert("HESABINIZA BAŞKA BİR CİHAZDAN GİRİŞ YAPILDI! Bu oturum kapatılıyor.");
-                                        window.location.reload();
-                                    }
-                                    if(currData && currData.durum === "bekliyor") {
-                                        alert("Sistem sıfırlandı. Lütfen tekrar giriş yapın.");
-                                        window.location.reload();
-                                    }
-                                    if(currData && currData.elendi) {
-                                        elendiMi = true; ekranGuncelle();
-                                    }
+                                    if(currData && currData.session_token !== benimSessionToken) { alert("HESABINIZA BAŞKA BİR CİHAZDAN GİRİŞ YAPILDI! Bu oturum kapatılıyor."); window.location.reload(); }
+                                    if(currData && currData.durum === "bekliyor") { alert("Sistem sıfırlandı. Lütfen tekrar giriş yapın."); window.location.reload(); }
+                                    if(currData && currData.elendi) { elendiMi = true; ekranGuncelle(); }
                                 });
 
-                                startLockTimer(); // Ceza kontrol döngüsünü başlat
-                                ekranGuncelle();
+                                startLockTimer(); ekranGuncelle();
                                 break;
                             }
                         }
@@ -226,7 +215,7 @@
             ekranGuncelle();
         });
 
-        // HARİTA ÇİZİMİ
+        // HARİTA ÇİZİMİ VE İLERLEME KALKANLARI
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
@@ -234,14 +223,38 @@
                 const hpGosterge = btn.querySelector('.hp-gosterge'); const vurusBar = btn.querySelector('.vurus-bar');
                 const data = bolgeler[`bolge_${i}`] || { hp: 6, vuruslar: {} };
                 
+                bolgeCanlari[i] = data.hp; // Global canları kaydet
+                
                 hpGosterge.innerText = `${data.hp}/6`; vurusBar.innerHTML = "";
                 let toplamVurus = 6 - data.hp;
                 if(toplamVurus > 0) { for(let takim in data.vuruslar) { let yuzde = (data.vuruslar[takim] / 6) * 100; vurusBar.innerHTML += `<div class="${takimRenkleri[takim]} h-full" style="width: ${yuzde}%"></div>`; } }
                 if(data.hp === 0) btn.classList.add('zone-conquered'); else btn.classList.remove('zone-conquered');
             }
+            
+            // YENİ: Hiyerarşik Harita Karartması (Görsel Kilit)
+            const b56Kilitli = (bolgeCanlari[1] > 0 || bolgeCanlari[2] > 0 || bolgeCanlari[3] > 0 || bolgeCanlari[4] > 0);
+            const b7Kilitli = (bolgeCanlari[5] > 0 || bolgeCanlari[6] > 0);
+            
+            document.getElementById('btn-bolge-5').style.filter = b56Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
+            document.getElementById('btn-bolge-6').style.filter = b56Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
+            document.getElementById('btn-bolge-7').style.filter = b7Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
         });
 
         function hedefSec(bolgeNo) {
+            // YENİ: HİYERARŞİK OYUN KURALLARI KONTROLÜ
+            if(bolgeNo === 5 || bolgeNo === 6) {
+                if(bolgeCanlari[1] > 0 || bolgeCanlari[2] > 0 || bolgeCanlari[3] > 0 || bolgeCanlari[4] > 0) {
+                    alert("🔒 ERİŞİM REDDEDİLDİ: İç koridorlara girmek için önce Dış Hatları (Bölge 1, 2, 3, 4) tamamen ele geçirmelisiniz!");
+                    return;
+                }
+            }
+            if(bolgeNo === 7) {
+                if(bolgeCanlari[5] > 0 || bolgeCanlari[6] > 0) {
+                    alert("🔒 ERİŞİM REDDEDİLDİ: Ana Reaktör kalkanları aktif! Önce Koridorları (Bölge 5 ve 6) aşmalısınız!");
+                    return;
+                }
+            }
+
             if(seciliBolge) document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili');
             if(cozulmusSorular[`bolge_${bolgeNo}`]) { alert("Bu bölgeye zaten ateş ettiniz!"); return; }
 
@@ -294,34 +307,25 @@
             } else {
                 // YANLIŞ VE CEZALAR
                 skorYanlis++; 
-                
                 let Updates = { yanlis: skorYanlis };
                 
-                // 5 Hata = Elendi
                 if(skorYanlis >= 5) {
-                    Updates.elendi = true;
-                    alert("Kritik Hata Limiti Aşıldı. SAVAŞ DIŞI KALDILAR.");
+                    Updates.elendi = true; alert("Kritik Hata Limiti Aşıldı. SAVAŞ DIŞI KALDILAR.");
                 } else {
-                    // Oyuncu Kilidi (Örn: 1. Hata 1dk = 60000ms, 2. Hata 2dk = 120000ms)
                     const now = Date.now();
                     const playerLockEnd = now + (skorYanlis * 60 * 1000); 
                     Updates.kilit_bitis = playerLockEnd;
-                    
-                    // Takım Kilidi (Tüm takımı 30sn dondurur)
-                    db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}`).update({
-                        takim_kilit_bitis: now + (30 * 1000)
-                    });
+                    db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}`).update({ takim_kilit_bitis: now + (30 * 1000) });
                 }
                 
                 userRef.update(Updates);
-                
                 const kutu = document.getElementById('gorev-alani');
                 kutu.classList.add('bg-red-900/50', 'border-red-500');
                 setTimeout(() => { kutu.classList.remove('bg-red-900/50', 'border-red-500'); }, 1500);
             }
         }
 
-        // CEZA ZAMANLAYICISI (Her Saniye Çalışır)
+        // CEZA ZAMANLAYICISI
         function startLockTimer() {
             if(lockInterval) clearInterval(lockInterval);
             
@@ -331,10 +335,8 @@
                 const now = Date.now();
                 let playerLock = 0; let teamLock = 0;
                 
-                // Kendi Kilit Süresini Çek
                 db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/terminal_${aktifTerminal}/kilit_bitis`).once('value').then(snap => {
                     playerLock = snap.val() || 0;
-                    // Takım Kilit Süresini Çek
                     db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/takim_kilit_bitis`).once('value').then(snap2 => {
                         teamLock = snap2.val() || 0;
                         
@@ -347,8 +349,7 @@
                         
                         if(maxLock > now) {
                             let kalanSaniye = Math.ceil((maxLock - now) / 1000);
-                            overlay.classList.remove('hidden');
-                            lockTimer.innerText = kalanSaniye;
+                            overlay.classList.remove('hidden'); lockTimer.innerText = kalanSaniye;
                             
                             if(maxLock === playerLock) {
                                 lockTitle.innerText = "SİSTEM SOĞUTULUYOR";
