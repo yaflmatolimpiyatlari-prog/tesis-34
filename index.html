@@ -17,7 +17,6 @@
         .fire-flash { animation: flash-red 0.5s ease-out; }
         @keyframes flash-red { 0% { background-color: #ef4444; } 100% { background-color: #0f172a; } }
         
-        /* GERÇEKÇİ ÇOKGEN HARİTA */
         .map-container { position: relative; width: 100%; aspect-ratio: 4/5; background: #020617; border-radius: 10px; overflow: hidden; border: 1px solid #334155; }
         .map-zone { position: absolute; background: #1e293b; border: 2px solid #475569; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s; cursor: pointer; }
         .map-zone:active { transform: scale(0.97); }
@@ -32,36 +31,25 @@
         
         .hedef-secili { border: 2px solid #ef4444 !important; filter: drop-shadow(0 0 8px #ef4444); }
         .zone-conquered { opacity: 0.4; pointer-events: none; border-color: #cbd5e1; }
-        
-        /* CEZA EKRANLARI */
         .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-2 relative">
 
-    <!-- 1. YENİ AKILLI GİRİŞ EKRANI (Sadece Şifre) -->
     <div id="login-screen" class="w-full max-w-md bg-slate-800 p-6 rounded-lg border border-slate-600 shadow-2xl mt-10 z-20">
         <h1 class="text-2xl font-bold text-cyan-400 text-center mb-2 neon-text">SAVAŞ TERMİNALİ</h1>
-        <p class="text-xs text-slate-400 text-center mb-8">Sisteme girmek için öğretmeninizin verdiği şifreyi yazın. Sistem sizi otomatik tanıyacaktır.</p>
-        
-        <div class="mb-8">
-            <input type="password" id="ogrenci-sifre" placeholder="GİZLİ ŞİFRENİZ" class="w-full bg-slate-900 border border-slate-500 p-4 rounded text-white text-center text-xl tracking-[1em] font-bold outline-none focus:border-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-        </div>
-
+        <p class="text-xs text-slate-400 text-center mb-8">Sisteme girmek için öğretmeninizin verdiği şifreyi yazın.</p>
+        <div class="mb-8"><input type="password" id="ogrenci-sifre" placeholder="GİZLİ ŞİFRENİZ" class="w-full bg-slate-900 border border-slate-500 p-4 rounded text-white text-center text-xl tracking-[1em] font-bold outline-none focus:border-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.2)]"></div>
         <button onclick="sistemeBaglan()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded text-lg">GİRİŞ YAP</button>
     </div>
 
-    <!-- 2. KİLİT EKRANI -->
     <div id="kilit-ekrani" class="hidden w-full max-w-md bg-slate-800 p-8 rounded border border-slate-600 shadow flex-col items-center justify-center text-center mt-10">
         <svg class="w-16 h-16 text-yellow-500 mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         <h2 class="text-xl font-bold text-yellow-400 mb-2 neon-text">SİSTEM KİLİTLİ</h2>
         <p class="text-sm text-slate-400">Komuta merkezinden Savaş İzni bekleniyor...</p>
     </div>
 
-    <!-- 3. ANA SAVAŞ EKRANI -->
     <div id="main-screen" class="hidden w-full max-w-md flex-col gap-2 pb-4 relative">
-        
-        <!-- CEZA (LOCK) OVERLAY (Dinamik JS ile açılacak) -->
         <div id="lock-overlay" class="hidden lock-overlay rounded">
             <svg class="w-16 h-16 text-red-500 mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             <h2 id="lock-title" class="text-2xl font-bold text-red-500 mb-2 neon-text text-center">AĞ SOĞUTULUYOR</h2>
@@ -74,8 +62,6 @@
                 <span id="kullanici-bilgi" class="text-cyan-400 font-bold text-xs tracking-wider"></span>
                 <span class="text-yellow-400 text-xs font-bold animate-pulse">SAVAŞ AKTİF</span>
             </div>
-            
-            <!-- ÇOKGEN HARİTA -->
             <div class="map-container" id="mobil-harita">
                 <div onclick="hedefSec(7)" id="btn-bolge-7" class="map-zone map-b7"><div class="text-[10px] font-bold text-slate-300 mb-1">ANA REAKTÖR (B7)</div><div class="text-sm font-bold text-white hp-gosterge">6/6</div><div class="vurus-bar"></div></div>
                 <div onclick="hedefSec(5)" id="btn-bolge-5" class="map-zone map-b5"><div class="text-[9px] font-bold text-slate-300 mb-1">SOL KORİDOR (B5)</div><div class="text-sm font-bold text-white hp-gosterge">6/6</div><div class="vurus-bar"></div></div>
@@ -91,30 +77,22 @@
             <div class="bg-red-900/30 border border-red-700 p-2 rounded text-center"><span class="text-red-400 font-bold text-sm">HEDEF: BÖLGE <span id="secili-bolge-no">X</span></span></div>
             <div id="soru-kutusu" class="bg-slate-900 p-3 rounded border border-slate-700 text-center min-h-[100px] flex flex-col justify-center text-sm"></div>
             <div id="secenekler-kutusu" class="flex flex-col gap-1.5">
-                <button onclick="atesle('A')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">A)</span> <span id="sık-A" class="flex-grow"></span></button>
-                <button onclick="atesle('B')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">B)</span> <span id="sık-B" class="flex-grow"></span></button>
-                <button onclick="atesle('C')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">C)</span> <span id="sık-C" class="flex-grow"></span></button>
-                <button onclick="atesle('D')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">D)</span> <span id="sık-D" class="flex-grow"></span></button>
-                <button onclick="atesle('E')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">E)</span> <span id="sık-E" class="flex-grow"></span></button>
+                <button onclick="atesle('A')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">A)</span> <span id="sık-A" class="flex-grow"></span></button><button onclick="atesle('B')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">B)</span> <span id="sık-B" class="flex-grow"></span></button><button onclick="atesle('C')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">C)</span> <span id="sık-C" class="flex-grow"></span></button><button onclick="atesle('D')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">D)</span> <span id="sık-D" class="flex-grow"></span></button><button onclick="atesle('E')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">E)</span> <span id="sık-E" class="flex-grow"></span></button>
             </div>
         </div>
     </div>
 
-    <!-- ELENDİN (ÖLÜM) EKRANI -->
     <div id="elendi-ekrani" class="hidden w-full max-w-md bg-red-900 p-8 rounded border border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] flex-col items-center justify-center text-center mt-10">
         <svg class="w-20 h-20 text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         <h2 class="text-3xl font-bold text-white mb-2 neon-text">SİSTEMDEN ATILDINIZ!</h2>
-        <p class="text-sm text-red-200">Kritik hata sınırını (5 Hata) aştığınız için terminaliniz kalıcı olarak kilitlendi. Takımınız savaşa sizsiz devam edecek.</p>
+        <p class="text-sm text-red-200">Kritik hata sınırını aştığınız için terminaliniz kilitlendi.</p>
     </div>
 
-    <!-- SAVAŞ BİTTİ (KARNE) EKRANI -->
     <div id="karne-ekrani" class="hidden w-full max-w-md bg-slate-800 p-8 rounded border border-purple-600 shadow-[0_0_30px_rgba(147,51,234,0.3)] flex-col items-center justify-center text-center mt-10">
         <h2 class="text-3xl font-bold text-purple-400 mb-2 neon-text">SAVAŞ SONA ERDİ</h2>
-        <p class="text-sm text-slate-300 mb-6 border-b border-slate-600 pb-4">Tesis-34 Operasyonu Tamamlandı. Komutan <span id="karne-isim" class="font-bold text-white"></span>, Performansınız:</p>
-        
+        <p class="text-sm text-slate-300 mb-6 border-b border-slate-600 pb-4">Tesis-34 Operasyonu Tamamlandı. Komutan <span id="karne-isim" class="font-bold text-white"></span></p>
         <div class="flex gap-8 mb-8">
-            <div class="flex flex-col items-center"><span class="text-4xl font-bold text-green-400" id="karne-dogru">0</span><span class="text-xs text-slate-400 mt-1">İSABET</span></div>
-            <div class="flex flex-col items-center"><span class="text-4xl font-bold text-red-400" id="karne-yanlis">0</span><span class="text-xs text-slate-400 mt-1">KARAVANA</span></div>
+            <div class="flex flex-col items-center"><span class="text-4xl font-bold text-green-400" id="karne-dogru">0</span><span class="text-xs text-slate-400 mt-1">İSABET</span></div><div class="flex flex-col items-center"><span class="text-4xl font-bold text-red-400" id="karne-yanlis">0</span><span class="text-xs text-slate-400 mt-1">KARAVANA</span></div>
         </div>
         <button onclick="pdfIndir()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded">SAVAŞ ARŞİVİNİ (PDF) İNDİR</button>
     </div>
@@ -132,257 +110,150 @@
         let seciliBolge = null; let dogruCevap = ""; let isSavasBasladi = false; let isSavasBitti = false;
         let cozulmusSorular = {}; let skorDogru = 0; let skorYanlis = 0; let elendiMi = false;
         let isGirisYapildi = false; let benimSessionToken = Math.random().toString(36).substr(2);
-        let bolgeCanlari = {1:6, 2:6, 3:6, 4:6, 5:6, 6:6, 7:6}; // YENİ: Kalkan/Kilit Motoru için
-        
-        let lockInterval = null;
-
+        let bolgeCanlari = {1:6, 2:6, 3:6, 4:6, 5:6, 6:6, 7:6}; let lockInterval = null;
         const takimRenkleri = { takim_1: 'bg-blue-500', takim_2: 'bg-green-500', takim_3: 'bg-purple-500', takim_4: 'bg-orange-500' };
 
-        // 1. AKILLI ŞİFRE ARAMA
         function sistemeBaglan() {
             const girilenSifre = document.getElementById('ogrenci-sifre').value.trim();
             if(girilenSifre === "") { alert("Şifre boş bırakılamaz!"); return; }
-
             db.ref('oyun_durumu/takimlar').once('value').then(snap => {
                 const takimlar = snap.val(); let bulundu = false;
-                
                 if(takimlar) {
-                    for(let t=1; t<=4; t++) {
-                        for(let term=1; term<=6; term++) {
-                            const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
-                            if(ogr && ogr.sifre === girilenSifre) {
-                                bulundu = true; aktifTakim = t; aktifTerminal = term;
-                                isGirisYapildi = true; ogrenciIsmi = ogr.isim;
-                                skorDogru = ogr.dogru || 0; skorYanlis = ogr.yanlis || 0;
-                                cozulmusSorular = ogr.cozulen_bolgeler || {}; elendiMi = ogr.elendi || false;
-                                
-                                const userRef = db.ref(`oyun_durumu/takimlar/takim_${t}/terminal_${term}`);
-                                userRef.update({ durum: "aktif", session_token: benimSessionToken });
-                                
-                                document.getElementById('kullanici-bilgi').innerText = `T-${t} / B-${term} : ${ogrenciIsmi.toUpperCase()}`;
-                                document.getElementById('karne-isim').innerText = ogrenciIsmi.toUpperCase();
-                                document.getElementById('login-screen').classList.add('hidden');
-                                
-                                userRef.on('value', snap => {
-                                    const currData = snap.val();
-                                    if(currData && currData.session_token !== benimSessionToken) { alert("HESABINIZA BAŞKA BİR CİHAZDAN GİRİŞ YAPILDI! Bu oturum kapatılıyor."); window.location.reload(); }
-                                    if(currData && currData.durum === "bekliyor") { alert("Sistem sıfırlandı. Lütfen tekrar giriş yapın."); window.location.reload(); }
-                                    if(currData && currData.elendi) { elendiMi = true; ekranGuncelle(); }
-                                });
-
-                                startLockTimer(); ekranGuncelle();
-                                break;
-                            }
+                    for(let t=1; t<=4; t++) { for(let term=1; term<=6; term++) {
+                        const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
+                        if(ogr && ogr.sifre === girilenSifre) {
+                            bulundu = true; aktifTakim = t; aktifTerminal = term; isGirisYapildi = true; ogrenciIsmi = ogr.isim;
+                            skorDogru = ogr.dogru || 0; skorYanlis = ogr.yanlis || 0; cozulmusSorular = ogr.cozulen_bolgeler || {}; elendiMi = ogr.elendi || false;
+                            const userRef = db.ref(`oyun_durumu/takimlar/takim_${t}/terminal_${term}`); userRef.update({ durum: "aktif", session_token: benimSessionToken });
+                            document.getElementById('kullanici-bilgi').innerText = `T-${t} / B-${term} : ${ogrenciIsmi.toUpperCase()}`;
+                            document.getElementById('karne-isim').innerText = ogrenciIsmi.toUpperCase(); document.getElementById('login-screen').classList.add('hidden');
+                            
+                            userRef.on('value', snap => {
+                                const currData = snap.val();
+                                if(currData && currData.session_token !== benimSessionToken) { alert("BAŞKA CİHAZDAN GİRİŞ YAPILDI! Oturum kapanıyor."); window.location.reload(); }
+                                if(currData && currData.durum === "bekliyor") { alert("Sistem sıfırlandı. Lütfen tekrar girin."); window.location.reload(); }
+                                if(currData && currData.elendi) { elendiMi = true; ekranGuncelle(); }
+                            });
+                            startLockTimer(); ekranGuncelle(); break;
                         }
-                        if(bulundu) break;
-                    }
+                    } if(bulundu) break; }
                 }
-                if(!bulundu) alert("Geçersiz şifre! Sisteme kayıtlı böyle bir şifre bulunamadı.");
+                if(!bulundu) alert("Geçersiz şifre!");
             });
         }
 
         function ekranGuncelle() {
             if(!isGirisYapildi) return; 
-
-            const kilitEkrani = document.getElementById('kilit-ekrani');
-            const mainScreen = document.getElementById('main-screen');
-            const karneEkrani = document.getElementById('karne-ekrani');
-            const elendiEkrani = document.getElementById('elendi-ekrani');
-
-            if(elendiMi) {
-                kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex');
-                mainScreen.classList.add('hidden'); mainScreen.classList.remove('flex');
-                karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex');
-                elendiEkrani.classList.remove('hidden'); elendiEkrani.classList.add('flex');
-            } else if(isSavasBitti) {
-                kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex');
-                mainScreen.classList.add('hidden'); mainScreen.classList.remove('flex');
-                karneEkrani.classList.remove('hidden'); karneEkrani.classList.add('flex');
-                document.getElementById('karne-dogru').innerText = skorDogru; document.getElementById('karne-yanlis').innerText = skorYanlis;
-            } else if(!isSavasBasladi) {
-                karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex');
-                mainScreen.classList.add('hidden'); mainScreen.classList.remove('flex');
-                kilitEkrani.classList.remove('hidden'); kilitEkrani.classList.add('flex');
-            } else {
-                kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex');
-                karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex');
-                mainScreen.classList.remove('hidden'); mainScreen.classList.add('flex');
-            }
+            const kilitEkrani = document.getElementById('kilit-ekrani'); const mainScreen = document.getElementById('main-screen'); const karneEkrani = document.getElementById('karne-ekrani'); const elendiEkrani = document.getElementById('elendi-ekrani');
+            if(elendiMi) { kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex'); mainScreen.classList.add('hidden'); mainScreen.classList.remove('flex'); karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex'); elendiEkrani.classList.remove('hidden'); elendiEkrani.classList.add('flex'); } 
+            else if(isSavasBitti) { kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex'); mainScreen.classList.add('hidden'); mainScreen.classList.remove('flex'); karneEkrani.classList.remove('hidden'); karneEkrani.classList.add('flex'); document.getElementById('karne-dogru').innerText = skorDogru; document.getElementById('karne-yanlis').innerText = skorYanlis; } 
+            else if(!isSavasBasladi) { karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex'); mainScreen.classList.add('hidden'); mainScreen.classList.remove('flex'); kilitEkrani.classList.remove('hidden'); kilitEkrani.classList.add('flex'); } 
+            else { kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex'); karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex'); mainScreen.classList.remove('hidden'); mainScreen.classList.add('flex'); }
         }
 
-        db.ref('harita_durumu/genel').on('value', snap => {
-            const veri = snap.val() || {}; isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false;
-            ekranGuncelle();
-        });
+        db.ref('harita_durumu/genel').on('value', snap => { const veri = snap.val() || {}; isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false; ekranGuncelle(); });
 
-        // HARİTA ÇİZİMİ VE İLERLEME KALKANLARI
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`btn-bolge-${i}`); if(!btn) continue;
                 const hpGosterge = btn.querySelector('.hp-gosterge'); const vurusBar = btn.querySelector('.vurus-bar');
-                const data = bolgeler[`bolge_${i}`] || { hp: 6, vuruslar: {} };
-                
-                bolgeCanlari[i] = data.hp; // Global canları kaydet
-                
-                hpGosterge.innerText = `${data.hp}/6`; vurusBar.innerHTML = "";
-                let toplamVurus = 6 - data.hp;
+                const data = bolgeler[`bolge_${i}`] || { hp: 6, vuruslar: {} }; bolgeCanlari[i] = data.hp;
+                hpGosterge.innerText = `${data.hp}/6`; vurusBar.innerHTML = ""; let toplamVurus = 6 - data.hp;
                 if(toplamVurus > 0) { for(let takim in data.vuruslar) { let yuzde = (data.vuruslar[takim] / 6) * 100; vurusBar.innerHTML += `<div class="${takimRenkleri[takim]} h-full" style="width: ${yuzde}%"></div>`; } }
                 if(data.hp === 0) btn.classList.add('zone-conquered'); else btn.classList.remove('zone-conquered');
             }
-            
-            // YENİ: Hiyerarşik Harita Karartması (Görsel Kilit)
             const b56Kilitli = (bolgeCanlari[1] > 0 || bolgeCanlari[2] > 0 || bolgeCanlari[3] > 0 || bolgeCanlari[4] > 0);
             const b7Kilitli = (bolgeCanlari[5] > 0 || bolgeCanlari[6] > 0);
-            
-            document.getElementById('btn-bolge-5').style.filter = b56Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
-            document.getElementById('btn-bolge-6').style.filter = b56Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
-            document.getElementById('btn-bolge-7').style.filter = b7Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
+            document.getElementById('btn-bolge-5').style.filter = b56Kilitli ? "grayscale(100%) brightness(0.5)" : "none"; document.getElementById('btn-bolge-6').style.filter = b56Kilitli ? "grayscale(100%) brightness(0.5)" : "none"; document.getElementById('btn-bolge-7').style.filter = b7Kilitli ? "grayscale(100%) brightness(0.5)" : "none";
         });
 
         function hedefSec(bolgeNo) {
-            // YENİ: HİYERARŞİK OYUN KURALLARI KONTROLÜ
-            if(bolgeNo === 5 || bolgeNo === 6) {
-                if(bolgeCanlari[1] > 0 || bolgeCanlari[2] > 0 || bolgeCanlari[3] > 0 || bolgeCanlari[4] > 0) {
-                    alert("🔒 ERİŞİM REDDEDİLDİ: İç koridorlara girmek için önce Dış Hatları (Bölge 1, 2, 3, 4) tamamen ele geçirmelisiniz!");
-                    return;
-                }
-            }
-            if(bolgeNo === 7) {
-                if(bolgeCanlari[5] > 0 || bolgeCanlari[6] > 0) {
-                    alert("🔒 ERİŞİM REDDEDİLDİ: Ana Reaktör kalkanları aktif! Önce Koridorları (Bölge 5 ve 6) aşmalısınız!");
-                    return;
-                }
-            }
-
+            if(bolgeNo === 5 || bolgeNo === 6) { if(bolgeCanlari[1] > 0 || bolgeCanlari[2] > 0 || bolgeCanlari[3] > 0 || bolgeCanlari[4] > 0) { alert("🔒 ERİŞİM REDDEDİLDİ: Önce alt bölgeleri ele geçirin!"); return; } }
+            if(bolgeNo === 7) { if(bolgeCanlari[5] > 0 || bolgeCanlari[6] > 0) { alert("🔒 ERİŞİM REDDEDİLDİ: Önce koridorları aşmalısınız!"); return; } }
             if(seciliBolge) document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili');
             if(cozulmusSorular[`bolge_${bolgeNo}`]) { alert("Bu bölgeye zaten ateş ettiniz!"); return; }
-
-            seciliBolge = bolgeNo;
-            document.getElementById(`btn-bolge-${bolgeNo}`).classList.add('hedef-secili');
-            document.getElementById('secili-bolge-no').innerText = bolgeNo;
-            document.getElementById('gorev-alani').classList.remove('hidden'); document.getElementById('gorev-alani').classList.add('flex');
-            document.getElementById('soru-kutusu').innerHTML = `<p class="text-slate-400 animate-pulse">Soru çekiliyor...</p>`;
+            seciliBolge = bolgeNo; document.getElementById(`btn-bolge-${bolgeNo}`).classList.add('hedef-secili'); document.getElementById('secili-bolge-no').innerText = bolgeNo; document.getElementById('gorev-alani').classList.remove('hidden'); document.getElementById('gorev-alani').classList.add('flex'); document.getElementById('soru-kutusu').innerHTML = `<p class="text-slate-400 animate-pulse">Soru çekiliyor...</p>`;
             
             db.ref(`sorular/bolge_${bolgeNo}/soru_${aktifTerminal}`).once('value').then((snapshot) => {
                 if(snapshot.exists()) {
-                    const veri = snapshot.val(); dogruCevap = veri.dogru_cevap;
-                    document.getElementById('soru-kutusu').innerHTML = veri.soru_metni.replace(/\n/g, '<br>');
-                    document.getElementById('sık-A').innerHTML = veri.secenekler.A; document.getElementById('sık-B').innerHTML = veri.secenekler.B;
-                    document.getElementById('sık-C').innerHTML = veri.secenekler.C; document.getElementById('sık-D').innerHTML = veri.secenekler.D; document.getElementById('sık-E').innerHTML = veri.secenekler.E;
+                    const veri = snapshot.val(); dogruCevap = veri.dogru_cevap; document.getElementById('soru-kutusu').innerHTML = veri.soru_metni.replace(/\n/g, '<br>');
+                    document.getElementById('sık-A').innerHTML = veri.secenekler.A; document.getElementById('sık-B').innerHTML = veri.secenekler.B; document.getElementById('sık-C').innerHTML = veri.secenekler.C; document.getElementById('sık-D').innerHTML = veri.secenekler.D; document.getElementById('sık-E').innerHTML = veri.secenekler.E;
                     try { renderMathInElement(document.getElementById('gorev-alani'), { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] }); } catch(e) {}
-                } else {
-                    document.getElementById('soru-kutusu').innerHTML = "<p class='text-red-400'>Komuta merkezi bu bölge için mühimmat yüklemedi.</p>"; dogruCevap = "";
-                }
+                } else { document.getElementById('soru-kutusu').innerHTML = "<p class='text-red-400'>Mühimmat yüklenmedi.</p>"; dogruCevap = ""; }
             });
         }
 
-        // FÜZEYİ ATEŞLE VE CEZA UYGULA
         function atesle(secilenSik) {
-            if(dogruCevap === "") return;
-            const userRef = db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/terminal_${aktifTerminal}`);
-
+            if(dogruCevap === "") return; const userRef = db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/terminal_${aktifTerminal}`);
             if(secilenSik === dogruCevap) {
-                // DOĞRU
-                document.body.classList.add('fire-flash'); setTimeout(() => document.body.classList.remove('fire-flash'), 500);
-                alert(`🚀 İSABET! Bölge ${seciliBolge} vuruldu.`);
-                cozulmusSorular[`bolge_${seciliBolge}`] = true;
-                skorDogru++; 
-                userRef.update({ dogru: skorDogru, cozulen_bolgeler: cozulmusSorular });
-                
+                document.body.classList.add('fire-flash'); setTimeout(() => document.body.classList.remove('fire-flash'), 500); alert(`🚀 İSABET!`);
+                cozulmusSorular[`bolge_${seciliBolge}`] = true; skorDogru++; userRef.update({ dogru: skorDogru, cozulen_bolgeler: cozulmusSorular });
                 const bolgeRef = db.ref(`harita_durumu/bolgeler/bolge_${seciliBolge}`);
                 bolgeRef.once('value').then(snap => {
                     let data = snap.val() || { hp: 6, vuruslar: {} };
-                    if(data.hp > 0) {
-                        data.hp -= 1;
-                        let takimKey = `takim_${aktifTakim}`; data.vuruslar[takimKey] = (data.vuruslar[takimKey] || 0) + 1;
-                        bolgeRef.set(data);
-                    }
+                    if(data.hp > 0) { data.hp -= 1; let takimKey = `takim_${aktifTakim}`; data.vuruslar[takimKey] = (data.vuruslar[takimKey] || 0) + 1; bolgeRef.set(data); }
                 });
-
-                document.getElementById('gorev-alani').classList.add('hidden');
-                document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili');
-                seciliBolge = null;
-                
+                document.getElementById('gorev-alani').classList.add('hidden'); document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili'); seciliBolge = null;
             } else {
-                // YANLIŞ VE CEZALAR
-                skorYanlis++; 
-                let Updates = { yanlis: skorYanlis };
-                
-                if(skorYanlis >= 5) {
-                    Updates.elendi = true; alert("Kritik Hata Limiti Aşıldı. SAVAŞ DIŞI KALDILAR.");
-                } else {
-                    const now = Date.now();
-                    const playerLockEnd = now + (skorYanlis * 60 * 1000); 
-                    Updates.kilit_bitis = playerLockEnd;
-                    db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}`).update({ takim_kilit_bitis: now + (30 * 1000) });
-                }
-                
-                userRef.update(Updates);
-                const kutu = document.getElementById('gorev-alani');
-                kutu.classList.add('bg-red-900/50', 'border-red-500');
-                setTimeout(() => { kutu.classList.remove('bg-red-900/50', 'border-red-500'); }, 1500);
+                skorYanlis++; let Updates = { yanlis: skorYanlis };
+                if(skorYanlis >= 5) { Updates.elendi = true; alert("Kritik Hata Limiti Aşıldı. SAVAŞ DIŞI KALDILAR."); } 
+                else { const now = Date.now(); Updates.kilit_bitis = now + (skorYanlis * 60 * 1000); db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}`).update({ takim_kilit_bitis: now + (30 * 1000) }); }
+                userRef.update(Updates); const kutu = document.getElementById('gorev-alani'); kutu.classList.add('bg-red-900/50', 'border-red-500'); setTimeout(() => { kutu.classList.remove('bg-red-900/50', 'border-red-500'); }, 1500);
             }
         }
 
-        // CEZA ZAMANLAYICISI
         function startLockTimer() {
             if(lockInterval) clearInterval(lockInterval);
-            
             lockInterval = setInterval(() => {
-                if(!isGirisYapildi || elendiMi) return;
-                
-                const now = Date.now();
-                let playerLock = 0; let teamLock = 0;
-                
+                if(!isGirisYapildi || elendiMi) return; const now = Date.now(); let playerLock = 0; let teamLock = 0;
                 db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/terminal_${aktifTerminal}/kilit_bitis`).once('value').then(snap => {
                     playerLock = snap.val() || 0;
                     db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/takim_kilit_bitis`).once('value').then(snap2 => {
-                        teamLock = snap2.val() || 0;
-                        
-                        const overlay = document.getElementById('lock-overlay');
-                        const lockTitle = document.getElementById('lock-title');
-                        const lockDesc = document.getElementById('lock-desc');
-                        const lockTimer = document.getElementById('lock-timer');
-                        
+                        teamLock = snap2.val() || 0; const overlay = document.getElementById('lock-overlay'); const lockTitle = document.getElementById('lock-title'); const lockDesc = document.getElementById('lock-desc'); const lockTimer = document.getElementById('lock-timer');
                         let maxLock = Math.max(playerLock, teamLock);
-                        
                         if(maxLock > now) {
-                            let kalanSaniye = Math.ceil((maxLock - now) / 1000);
-                            overlay.classList.remove('hidden'); lockTimer.innerText = kalanSaniye;
-                            
-                            if(maxLock === playerLock) {
-                                lockTitle.innerText = "SİSTEM SOĞUTULUYOR";
-                                lockDesc.innerText = "Yanlış mühimmat ateşlediniz. Bataryanız geçici olarak kilitlendi.";
-                            } else {
-                                lockTitle.innerText = "TAKIM AĞI SOĞUTULUYOR";
-                                lockDesc.innerText = "Takım arkadaşlarınızdan biri hata yaptı. Tüm takımın ağı kilitlendi.";
-                            }
-                        } else {
-                            overlay.classList.add('hidden');
-                        }
+                            let kalanSaniye = Math.ceil((maxLock - now) / 1000); overlay.classList.remove('hidden'); lockTimer.innerText = kalanSaniye;
+                            if(maxLock === playerLock) { lockTitle.innerText = "SİSTEM SOĞUTULUYOR"; lockDesc.innerText = "Bataryanız geçici olarak kilitlendi."; } 
+                            else { lockTitle.innerText = "TAKIM AĞI SOĞUTULUYOR"; lockDesc.innerText = "Tüm takımın ağı kilitlendi."; }
+                        } else { overlay.classList.add('hidden'); }
                     });
                 });
             }, 1000);
         }
 
+        // İKİ SÜTUNLU YENİ MÜKEMMEL PDF MOTORU
         function pdfIndir() {
             db.ref('sorular').once('value').then(snap => {
-                const data = snap.val(); if(!data) return;
-                let html = "<div style='padding:40px; font-family:Arial, sans-serif;'><h2 style='text-align:center; color:#333; margin-bottom:30px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
+                const data = snap.val(); if(!data) { alert("Soru bulunamadı!"); return; }
+                let html = "<div style='padding:20px; font-family:Arial, sans-serif;'>";
+                html += "<h2 style='text-align:center; color:#333; margin-bottom:15px; border-bottom:2px solid #ccc; padding-bottom:10px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
+                
                 for(let b=1; b<=7; b++){
                     if(data[`bolge_${b}`]){
-                        html += `<h3 style='border-bottom:2px solid #ccc; padding-bottom:5px; margin-top:20px; color:#555;'>BÖLGE ${b} HEDEFLERİ</h3>`;
+                        html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3>`;
+                        html += `<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
                         for(let s=1; s<=6; s++){
                              let soru = data[`bolge_${b}`][`soru_${s}`];
-                             if(soru) html += `<div style='margin-bottom:20px; background:#f9f9f9; padding:15px; border-radius:8px;'><p><b>Batarya ${s}:</b> ${soru.soru_metni}</p><ul style='list-style:none; padding-left:0;'><li><b>A)</b> ${soru.secenekler.A}</li><li><b>B)</b> ${soru.secenekler.B}</li><li><b>C)</b> ${soru.secenekler.C}</li><li><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:green; font-weight:bold;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
+                             if(soru) {
+                                 html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'>`;
+                                 html += `<p style='margin-top:0; font-size:14px;'><b>Batarya ${s}:</b> ${soru.soru_metni}</p>`;
+                                 html += `<ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'>
+                                    <li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li>
+                                    <li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li>
+                                    <li><b>E)</b> ${soru.secenekler.E}</li></ul>`;
+                                 html += `<p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
+                             }
                         }
+                        html += `</div>`;
                     }
                 }
                 html += "</div>";
                 const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; 
                 renderMathInElement(container, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
-                const opt = { margin: 1, filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+                
+                const opt = { margin: [0.4, 0.4, 0.4, 0.4], filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+                alert("Sorular 2 sütunlu pdf olarak hazırlanıyor...");
                 html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
             });
         }
