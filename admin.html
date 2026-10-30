@@ -12,10 +12,8 @@
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
         .neon-text { text-shadow: 0 0 5px currentColor; }
-        
-        /* GERÇEKÇİ ÇOKGEN HARİTA TASARIMI */
         .map-container { position: relative; width: 100%; aspect-ratio: 4/5; background: #020617; border-radius: 10px; overflow: hidden; border: 1px solid #334155; }
-        .map-zone { position: absolute; background: #1e293b; border: 2px solid #475569; display: flex; flex-direction: column; align-items: center; justify-center: center; padding-top: 15%; transition: all 0.3s; }
+        .map-zone { position: absolute; background: #1e293b; border: 2px solid #475569; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 15%; transition: all 0.3s; }
         .map-b7 { clip-path: polygon(50% 0%, 100% 30%, 80% 80%, 20% 80%, 0% 30%); top: 5%; left: 20%; width: 60%; height: 35%; padding-top:10%; }
         .map-b5 { clip-path: polygon(0% 0%, 80% 0%, 100% 60%, 75% 100%, 0% 100%); top: 40%; left: 5%; width: 43%; height: 30%; padding-top:10%; }
         .map-b6 { clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 25% 100%, 0% 60%); top: 40%; left: 52%; width: 43%; height: 30%; padding-top:10%; }
@@ -24,7 +22,6 @@
         .map-b3 { clip-path: polygon(0% 0%, 100% 20%, 80% 100%, 0% 100%); top: 72%; left: 52%; width: 22%; height: 25%; padding-top:15%; }
         .map-b4 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 76%; width: 22%; height: 25%; padding-top:15%; }
         .vurus-bar { width: 60%; height: 6px; background: #0f172a; margin-top: 5px; border-radius: 3px; display: flex; overflow: hidden; }
-        
         .zone-conquered { border: 2px solid #e2e8f0; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
     </style>
 </head>
@@ -32,7 +29,7 @@
     <header class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
         <div>
             <h1 class="text-3xl text-cyan-400 font-bold neon-text tracking-widest">SAVAŞ KOMUTA MERKEZİ</h1>
-            <p class="text-xs text-slate-400 mt-1">Gelişmiş Taktik Harita ve Öğrenci Yönetimi</p>
+            <p class="text-xs text-slate-400 mt-1">Gelişmiş Taktik Harita ve Raporlama Sistemi</p>
         </div>
         <div class="text-right flex gap-4 items-center">
             <div>
@@ -40,7 +37,7 @@
                 <span id="savas-durum-gosterge" class="text-yellow-400 font-bold ml-2">ATEŞKES (BEKLİYOR)</span>
             </div>
             <button onclick="savasiBaslatToggle()" id="btn-savas-baslat" class="bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-2 px-6 rounded transition-colors shadow-[0_0_10px_rgba(22,163,74,0.4)]">SAVAŞI BAŞLAT</button>
-            <button onclick="savasiBitir()" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold py-2 px-6 rounded transition-colors shadow-[0_0_10px_rgba(147,51,234,0.4)]">SAVAŞI BİTİR (RAPOR)</button>
+            <button onclick="savasiBitir()" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold py-2 px-6 rounded transition-colors shadow-[0_0_10px_rgba(147,51,234,0.4)]">SAVAŞI BİTİR</button>
         </div>
     </header>
     
@@ -48,23 +45,18 @@
         
         <!-- SOL PANEL -->
         <div class="w-full xl:w-5/12 flex flex-col gap-6">
-            
             <div class="bg-slate-800 p-5 rounded border border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.2)]">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-3">
                     <h2 class="text-base text-blue-400 font-bold">👨‍🚀 Komutan (Öğrenci) Tanımla</h2>
                     <button onclick="tumSinifiSil()" class="text-[10px] text-red-400 hover:text-red-300 underline">Tüm Kayıtları Temizle</button>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="ata_takim" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none focus:border-blue-400">
-                        <option value="1">Takım 1 (Alfa)</option><option value="2">Takım 2 (Beta)</option><option value="3">Takım 3 (Gama)</option><option value="4">Takım 4 (Delta)</option>
-                    </select>
-                    <select id="ata_terminal" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none focus:border-blue-400">
-                        <option value="1">Batarya 1</option><option value="2">Batarya 2</option><option value="3">Batarya 3</option><option value="4">Batarya 4</option><option value="5">Batarya 5</option><option value="6">Batarya 6</option>
-                    </select>
+                    <select id="ata_takim" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"><option value="1">Takım 1 (Alfa)</option><option value="2">Takım 2 (Beta)</option><option value="3">Takım 3 (Gama)</option><option value="4">Takım 4 (Delta)</option></select>
+                    <select id="ata_terminal" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"><option value="1">Batarya 1</option><option value="2">Batarya 2</option><option value="3">Batarya 3</option><option value="4">Batarya 4</option><option value="5">Batarya 5</option><option value="6">Batarya 6</option></select>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mb-3">
-                    <input type="text" id="ata_isim" placeholder="Öğrenci Adı" class="bg-slate-900 border border-slate-600 p-2 rounded text-white text-sm outline-none focus:border-blue-400">
-                    <input type="text" id="ata_sifre" placeholder="Özel Şifre (Örn: 1453)" class="bg-slate-900 border border-slate-600 p-2 rounded text-white text-sm outline-none focus:border-blue-400">
+                    <input type="text" id="ata_isim" placeholder="Öğrenci Adı" class="bg-slate-900 border border-slate-600 p-2 rounded text-white text-sm outline-none">
+                    <input type="text" id="ata_sifre" placeholder="Özel Şifre (Örn: 1453)" class="bg-slate-900 border border-slate-600 p-2 rounded text-white text-sm outline-none">
                 </div>
                 <button onclick="ogrenciAta()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-sm transition-colors">ÖĞRENCİYİ SİSTEME KAYDET</button>
             </div>
@@ -72,49 +64,38 @@
             <div class="bg-slate-800 p-5 rounded border border-slate-600 shadow-lg flex-grow flex flex-col">
                 <h2 class="text-base mb-3 text-yellow-400 font-bold flex justify-between items-center border-b border-slate-700 pb-2">
                     <span>🚀 Füze Bataryası (Soru) Yükle</span>
-                    <button onclick="pdfIndir()" class="text-xs bg-cyan-900 hover:bg-cyan-700 text-cyan-200 py-1 px-2 rounded border border-cyan-700">TÜMÜNÜ PDF İNDİR</button>
+                    <button onclick="pdfIndir()" class="text-xs bg-cyan-900 hover:bg-cyan-700 text-cyan-200 py-1 px-2 rounded border border-cyan-700">SORULARI (PDF) İNDİR</button>
                 </h2>
                 <div class="grid grid-cols-2 gap-4 mb-3">
-                    <select id="bolge" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none">
-                        <option value="1">Bölge 1 (Sol Dış)</option><option value="2">Bölge 2 (İç Sol)</option><option value="3">Bölge 3 (İç Sağ)</option><option value="4">Bölge 4 (Sağ Dış)</option>
-                        <option value="5">Bölge 5 (Sol Koridor)</option><option value="6">Bölge 6 (Sağ Koridor)</option><option value="7">Bölge 7 (Ana Reaktör)</option>
-                    </select>
-                    <select id="soru_no" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none">
-                        <option value="1">Soru 1</option><option value="2">Soru 2</option><option value="3">Soru 3</option><option value="4">Soru 4</option><option value="5">Soru 5</option><option value="6">Soru 6</option>
-                    </select>
+                    <select id="bolge" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"><option value="1">Bölge 1</option><option value="2">Bölge 2</option><option value="3">Bölge 3</option><option value="4">Bölge 4</option><option value="5">Bölge 5</option><option value="6">Bölge 6</option><option value="7">Bölge 7 (Reaktör)</option></select>
+                    <select id="soru_no" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"><option value="1">Soru 1</option><option value="2">Soru 2</option><option value="3">Soru 3</option><option value="4">Soru 4</option><option value="5">Soru 5</option><option value="6">Soru 6</option></select>
                 </div>
-                <div class="mb-3">
-                    <textarea id="soru_metni" rows="2" placeholder="Soru metnini girin ($$ formül $$)..." class="w-full bg-slate-900 border border-slate-600 p-2 rounded outline-none focus:border-cyan-400 text-sm" oninput="updatePreview()"></textarea>
-                </div>
+                <div class="mb-3"><textarea id="soru_metni" rows="2" placeholder="Soru metnini girin..." class="w-full bg-slate-900 border border-slate-600 p-2 rounded outline-none focus:border-cyan-400 text-sm" oninput="updatePreview()"></textarea></div>
                 <div class="grid grid-cols-2 gap-2 mb-3 text-sm">
                     <input type="text" id="secenek_A" placeholder="A Şıkkı" class="bg-slate-900 border border-slate-600 p-2 rounded"><input type="text" id="secenek_B" placeholder="B Şıkkı" class="bg-slate-900 border border-slate-600 p-2 rounded"><input type="text" id="secenek_C" placeholder="C Şıkkı" class="bg-slate-900 border border-slate-600 p-2 rounded"><input type="text" id="secenek_D" placeholder="D Şıkkı" class="bg-slate-900 border border-slate-600 p-2 rounded"><input type="text" id="secenek_E" placeholder="E Şıkkı" class="bg-slate-900 border border-slate-600 p-2 rounded col-span-2">
                 </div>
-                <div class="mb-3">
-                    <select id="dogru_cevap" class="w-full bg-slate-900 border border-green-600 p-2 rounded text-green-400 font-bold outline-none text-sm">
-                        <option value="A">Doğru Cevap: A</option><option value="B">Doğru Cevap: B</option><option value="C">Doğru Cevap: C</option><option value="D">Doğru Cevap: D</option><option value="E">Doğru Cevap: E</option>
-                    </select>
-                </div>
+                <div class="mb-3"><select id="dogru_cevap" class="w-full bg-slate-900 border border-green-600 p-2 rounded text-green-400 font-bold outline-none text-sm"><option value="A">Doğru Cevap: A</option><option value="B">Doğru Cevap: B</option><option value="C">Doğru Cevap: C</option><option value="D">Doğru Cevap: D</option><option value="E">Doğru Cevap: E</option></select></div>
                 <div class="flex gap-2">
-                    <button onclick="kaydet()" class="flex-grow bg-cyan-600 hover:bg-cyan-500 p-2 rounded font-bold text-sm transition-colors">SİSTEME YÜKLE</button>
+                    <button onclick="kaydet()" class="flex-grow bg-cyan-600 hover:bg-cyan-500 p-2 rounded font-bold text-sm">SİSTEME YÜKLE</button>
                     <button onclick="soruyuSil()" class="bg-red-900 hover:bg-red-700 text-white p-2 rounded font-bold text-sm border border-red-700">🗑️ SİL</button>
                 </div>
-                <div class="mt-2 border-t border-slate-700 pt-2">
-                    <div id="onizleme" class="bg-slate-900 p-2 border border-slate-700 rounded h-[60px] overflow-y-auto text-xs text-center text-slate-300">Önizleme...</div>
-                </div>
+                <div class="mt-2 border-t border-slate-700 pt-2"><div id="onizleme" class="bg-slate-900 p-2 border border-slate-700 rounded h-[60px] overflow-y-auto text-xs text-center text-slate-300">Önizleme...</div></div>
             </div>
         </div>
 
-        <!-- SAĞ: Yeni Harita ve Rapor -->
+        <!-- SAĞ PANEL: Harita ve Yeni Rapor Modülü -->
         <div class="bg-slate-800 p-6 rounded border border-slate-600 w-full xl:w-7/12 shadow-lg flex flex-col">
             <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
-                <h2 class="text-lg text-cyan-400 font-bold">Gerçek Zamanlı Topoloji ve Rapor</h2>
-                <button onclick="haritayiSifirla()" class="text-xs bg-red-900 hover:bg-red-700 text-white py-1 px-3 rounded">PUANLARI VE HARİTAYI SIFIRLA</button>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg text-cyan-400 font-bold">Harita ve Rapor</h2>
+                    <!-- YENİ: SIRALI ÖĞRENCİ PDF BUTONU -->
+                    <button onclick="raporPdfIndir()" class="text-[10px] bg-purple-900 hover:bg-purple-700 text-purple-200 py-1 px-2 rounded border border-purple-700 ml-2">SIRALI ÖĞRENCİ LİSTESİ (PDF)</button>
+                </div>
+                <button onclick="haritayiSifirla()" class="text-xs bg-red-900 hover:bg-red-700 text-white py-1 px-3 rounded">PUAN/HARİTA SIFIRLA</button>
             </div>
             
-            <!-- Öğrenci Tablosu -->
             <div id="performans-tablosu" class="grid grid-cols-2 gap-2 mb-4 max-h-[140px] overflow-y-auto pr-2"></div>
 
-            <!-- YENİ: ÇOKGEN HARİTA -->
             <div class="flex-grow flex items-center justify-center pt-2">
                 <div class="map-container" id="harita-radar">
                     <div id="radar-bolge-7" class="map-zone map-b7"><div class="text-[10px] font-bold text-slate-400 mb-1">ANA REAKTÖR (B7)</div><div class="text-lg font-bold text-white hp-gosterge">6/6</div><div class="vurus-bar"></div></div>
@@ -139,41 +120,24 @@
         const firebaseConfig = { apiKey: "AIzaSyBNNjeKMq9MkYcWn8wXK_Zye6M5qHG_G4k", authDomain: "yafl-tesis-34.firebaseapp.com", databaseURL: "https://yafl-tesis-34-default-rtdb.europe-west1.firebasedatabase.app", projectId: "yafl-tesis-34", storageBucket: "yafl-tesis-34.firebasestorage.app", messagingSenderId: "561962762810", appId: "1:561962762810:web:6aa5bcdbb2c08b6b232b03" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         let isSavasBasladi = false; let isSavasBitti = false;
-
         window.onload = () => { soruyuGetir(); };
 
         function ogrenciAta() {
-            const takim = document.getElementById('ata_takim').value;
-            const term = document.getElementById('ata_terminal').value;
-            const isim = document.getElementById('ata_isim').value.trim();
-            const sifre = document.getElementById('ata_sifre').value.trim();
-            if(!isim || !sifre) { alert("Lütfen isim ve şifre belirleyiniz!"); return; }
-            db.ref(`oyun_durumu/takimlar/takim_${takim}/terminal_${term}`).set({
-                isim: isim, sifre: sifre, durum: "bekliyor", dogru: 0, yanlis: 0, elendi: false, cozulen_bolgeler: {}
-            }).then(() => { alert(`✓ Kayıt Başarılı!\nÖğrenciye verilecek şifre: ${sifre}`); document.getElementById('ata_isim').value = ""; document.getElementById('ata_sifre').value = ""; });
+            const takim = document.getElementById('ata_takim').value; const term = document.getElementById('ata_terminal').value;
+            const isim = document.getElementById('ata_isim').value.trim(); const sifre = document.getElementById('ata_sifre').value.trim();
+            if(!isim || !sifre) { alert("İsim ve şifre zorunlu!"); return; }
+            db.ref(`oyun_durumu/takimlar/takim_${takim}/terminal_${term}`).set({ isim: isim, sifre: sifre, durum: "bekliyor", dogru: 0, yanlis: 0, elendi: false, cozulen_bolgeler: {} }).then(() => { alert("Kaydedildi!"); document.getElementById('ata_isim').value=""; document.getElementById('ata_sifre').value=""; });
         }
-
         function tumSinifiSil() { if(confirm("Tüm öğrenciler KÖKTEN silinecek. Onaylıyor musunuz?")) db.ref('oyun_durumu/takimlar').remove(); }
         function savasiBaslatToggle() { if(!isSavasBitti) db.ref('harita_durumu/genel/savas_basladi').set(!isSavasBasladi); }
         function savasiBitir() { if(confirm("Savaşı bitir?")) db.ref('harita_durumu/genel').set({ savas_basladi: false, savas_bitti: true }); }
-
         function haritayiSifirla() {
             if(confirm("Harita ve Puanlar sıfırlanacak. (ŞİFRELER KALACAK). Onaylıyor musunuz?")) {
                 db.ref('harita_durumu').set({ genel: { savas_basladi: false, savas_bitti: false } });
-                db.ref('oyun_durumu/takimlar').once('value').then(snap => {
-                    const takimlar = snap.val();
-                    if(takimlar) {
-                        for(let t=1; t<=4; t++) { for(let term=1; term<=6; term++) {
-                            if(takimlar[`takim_${t}`]?.[`terminal_${term}`]) {
-                                db.ref(`oyun_durumu/takimlar/takim_${t}/terminal_${term}`).update({ durum: "bekliyor", dogru: 0, yanlis: 0, elendi: false, cozulen_bolgeler: null, kilit_bitis: null });
-                            }
-                        }}
-                    }
-                });
+                db.ref('oyun_durumu/takimlar').once('value').then(snap => { const takimlar = snap.val(); if(takimlar) { for(let t=1; t<=4; t++) { for(let term=1; term<=6; term++) { if(takimlar[`takim_${t}`]?.[`terminal_${term}`]) { db.ref(`oyun_durumu/takimlar/takim_${t}/terminal_${term}`).update({ durum: "bekliyor", dogru: 0, yanlis: 0, elendi: false, cozulen_bolgeler: null, kilit_bitis: null }); } } } } });
             }
         }
 
-        // DB Dinleyiciler
         db.ref('harita_durumu/genel').on('value', snap => {
             const veri = snap.val() || {}; isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false;
             const btn = document.getElementById('btn-savas-baslat'); const gosterge = document.getElementById('savas-durum-gosterge');
@@ -208,7 +172,6 @@
             }
         });
 
-        // Soru Form Fonksiyonları
         function soruyuGetir() {
             const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value;
             db.ref(`sorular/bolge_${b}/soru_${s}`).once('value').then((snap) => {
@@ -223,26 +186,76 @@
         }
         function soruyuSil() { const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value; if(confirm(`Emin misiniz?`)) { db.ref(`sorular/bolge_${b}/soru_${s}`).remove().then(() => { soruyuGetir(); }); } }
 
+        // 1. YENİ: İKİ SÜTUNLU NİZAMİ SORU ARŞİVİ PDF'İ
         function pdfIndir() {
             db.ref('sorular').once('value').then(snap => {
                 const data = snap.val(); if(!data) { alert("Soru bulunamadı!"); return; }
-                let html = "<div style='padding:40px; font-family:Arial, sans-serif;'><h2 style='text-align:center; color:#333; margin-bottom:30px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
+                let html = "<div style='padding:20px; font-family:Arial, sans-serif;'>";
+                html += "<h2 style='text-align:center; color:#333; margin-bottom:15px; border-bottom:2px solid #ccc; padding-bottom:10px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
+                
                 for(let b=1; b<=7; b++){
                     if(data[`bolge_${b}`]){
-                        html += `<h3 style='border-bottom:2px solid #ccc; padding-bottom:5px; margin-top:20px; color:#555;'>BÖLGE ${b} HEDEFLERİ</h3>`;
+                        html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3>`;
+                        // CSS Grid ile Mükemmel 2 Sütun
+                        html += `<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
                         for(let s=1; s<=6; s++){
                              let soru = data[`bolge_${b}`][`soru_${s}`];
                              if(soru) {
-                                 html += `<div style='margin-bottom:20px; background:#f9f9f9; padding:15px; border-radius:8px;'><p><b>Batarya ${s}:</b> ${soru.soru_metni}</p><ul style='list-style:none; padding-left:0;'><li><b>A)</b> ${soru.secenekler.A}</li><li><b>B)</b> ${soru.secenekler.B}</li><li><b>C)</b> ${soru.secenekler.C}</li><li><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:green; font-weight:bold;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
+                                 html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'>`;
+                                 html += `<p style='margin-top:0; font-size:14px;'><b>Batarya ${s}:</b> ${soru.soru_metni}</p>`;
+                                 html += `<ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'>
+                                    <li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li>
+                                    <li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li>
+                                    <li><b>E)</b> ${soru.secenekler.E}</li></ul>`;
+                                 html += `<p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
                              }
                         }
+                        html += `</div>`;
                     }
                 }
                 html += "</div>";
                 const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; 
                 renderMathInElement(container, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
-                const opt = { margin: 1, filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
-                alert("PDF Hazırlanıyor..."); html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
+                
+                // Kenar boşlukları ayarlanmış gelişmiş PDF motoru
+                const opt = { margin: [0.4, 0.4, 0.4, 0.4], filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+                alert("Sorular 2 sütunlu pdf olarak hazırlanıyor... Lütfen bekleyin.");
+                html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
+            });
+        }
+
+        // 2. YENİ: ÖĞRETMENE ÖZEL SIRALI ÖĞRENCİ PDF RAPORU
+        function raporPdfIndir() {
+            db.ref('oyun_durumu/takimlar').once('value').then(snap => {
+                const takimlar = snap.val(); if(!takimlar) { alert("Henüz öğrenci verisi yok!"); return; }
+                let ogrenciler = []; const takimIsimleri = ["ALFA", "BETA", "GAMA", "DELTA"];
+                for(let t=1; t<=4; t++) {
+                    for(let term=1; term<=6; term++) {
+                        const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
+                        if(ogr && ogr.isim) ogrenciler.push({ isim: ogr.isim, takim: takimIsimleri[t-1], batarya: term, dogru: ogr.dogru || 0, yanlis: ogr.yanlis || 0, elendi: ogr.elendi || false });
+                    }
+                }
+                // En çok doğru yapana göre sırala (Eşitse az yanlışa göre)
+                ogrenciler.sort((a, b) => { if (b.dogru !== a.dogru) return b.dogru - a.dogru; return a.yanlis - b.yanlis; });
+                
+                let html = "<div style='padding:30px; font-family:Arial, sans-serif;'>";
+                html += "<h2 style='text-align:center; color:#1e293b; margin-bottom:10px;'>TESİS-34 // SAVAŞ SONU PERFORMANS RAPORU</h2>";
+                html += "<p style='text-align:center; color:#64748b; margin-bottom:30px; font-size:12px;'>Sıralama isabet (doğru) sayısına göre büyükten küçüğe yapılmıştır.</p>";
+                
+                html += "<table style='width:100%; border-collapse: collapse; text-align:left; font-size:14px;'>";
+                html += "<tr style='background:#1e293b; color:white;'><th style='padding:10px; border:1px solid #cbd5e1;'>Sıra</th><th style='padding:10px; border:1px solid #cbd5e1;'>Komutan Adı</th><th style='padding:10px; border:1px solid #cbd5e1;'>Takım / Batarya</th><th style='padding:10px; border:1px solid #cbd5e1; text-align:center;'>İsabet (✓)</th><th style='padding:10px; border:1px solid #cbd5e1; text-align:center;'>Karavana (✗)</th><th style='padding:10px; border:1px solid #cbd5e1; text-align:center;'>Durum</th></tr>";
+                
+                ogrenciler.forEach((ogr, index) => {
+                    let bg = index % 2 === 0 ? "#f8fafc" : "#f1f5f9";
+                    let durum = ogr.elendi ? "<span style='color:#ef4444; font-weight:bold;'>SİSTEM DIŞI</span>" : "<span style='color:#16a34a; font-weight:bold;'>HAYATTA</span>";
+                    html += `<tr style='background:${bg};'><td style='padding:10px; border:1px solid #cbd5e1; text-align:center;'>${index + 1}</td><td style='padding:10px; border:1px solid #cbd5e1; font-weight:bold;'>${ogr.isim}</td><td style='padding:10px; border:1px solid #cbd5e1;'>${ogr.takim} / B-${ogr.batarya}</td><td style='padding:10px; border:1px solid #cbd5e1; text-align:center; color:#16a34a; font-weight:bold;'>${ogr.dogru}</td><td style='padding:10px; border:1px solid #cbd5e1; text-align:center; color:#ef4444; font-weight:bold;'>${ogr.yanlis}</td><td style='padding:10px; border:1px solid #cbd5e1; text-align:center;'>${durum}</td></tr>`;
+                });
+                html += "</table></div>";
+                
+                const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; 
+                const opt = { margin: 0.5, filename: 'Tesis34_Ogrenci_Siralama.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+                alert("Öğrenci Sıralama Raporu PDF olarak hazırlanıyor...");
+                html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
             });
         }
     </script>
