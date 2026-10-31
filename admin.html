@@ -21,6 +21,7 @@
         .map-b2 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 26%; width: 22%; height: 25%; padding-top:15%; }
         .map-b3 { clip-path: polygon(0% 0%, 100% 20%, 80% 100%, 0% 100%); top: 72%; left: 52%; width: 22%; height: 25%; padding-top:15%; }
         .map-b4 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 76%; width: 22%; height: 25%; padding-top:15%; }
+        .zone-conquered { border: 3px solid #ffffff !important; box-shadow: 0 0 20px rgba(255,255,255,0.8); z-index: 10; }
         .text-shadow-hard { text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9); }
     </style>
 </head>
@@ -59,25 +60,40 @@
                 <button onclick="kapasiteAyarla()" class="bg-cyan-700 hover:bg-cyan-600 text-white text-[10px] font-bold px-2 py-1.5 rounded mt-1">SORU KAPASİTESİNİ UYGULA VE SİSTEMİ SIFIRLA</button>
             </div>
 
-            <div class="bg-slate-800 p-4 rounded border border-slate-600 shadow-lg flex-grow flex flex-col">
+            <!-- MÜHİMMAT YÜKLEME MODÜLÜ -->
+            <div class="bg-slate-800 p-4 rounded border border-slate-600 shadow-lg flex-grow flex flex-col relative">
                 <h2 class="text-sm mb-2 text-yellow-400 font-bold flex justify-between items-center border-b border-slate-700 pb-2">
                     <span>🚀 Mühimmat (Soru) Yükle</span>
-                    <button onclick="pdfIndir()" class="text-[10px] bg-cyan-900 hover:bg-cyan-700 text-cyan-200 py-1 px-2 rounded border border-cyan-700">SORULARI İNDİR</button>
+                    <div class="flex gap-2">
+                        <!-- YENİ: TÜM SORULARI SİL BUTONU -->
+                        <button onclick="tumSorulariSil()" class="text-[9px] bg-red-900 hover:bg-red-700 text-red-200 py-1 px-2 rounded border border-red-700">TÜM SORULARI SİL</button>
+                        <button onclick="pdfIndir()" class="text-[9px] bg-cyan-900 hover:bg-cyan-700 text-cyan-200 py-1 px-2 rounded border border-cyan-700">SORULARI İNDİR</button>
+                    </div>
                 </h2>
+                
                 <div class="grid grid-cols-2 gap-2 mb-2">
                     <select id="bolge" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-1.5 rounded text-slate-300 text-xs outline-none"><option value="1">Bölge 1</option><option value="2">Bölge 2</option><option value="3">Bölge 3</option><option value="4">Bölge 4</option><option value="5">Bölge 5</option><option value="6">Bölge 6</option><option value="7">Bölge 7 (Reaktör)</option></select>
                     <select id="soru_no" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-1.5 rounded text-slate-300 text-xs outline-none"><option value="1">Soru 1</option><option value="2">Soru 2</option><option value="3">Soru 3</option><option value="4">Soru 4</option><option value="5">Soru 5</option><option value="6">Soru 6</option></select>
                 </div>
-                <div class="mb-2"><textarea id="soru_metni" rows="2" placeholder="Soru metnini girin ($$ formül $$)..." class="w-full bg-slate-900 border border-slate-600 p-2 rounded outline-none focus:border-cyan-400 text-xs" oninput="updatePreview()"></textarea></div>
+                
+                <div class="mb-2"><textarea id="soru_metni" rows="2" placeholder="Soru metnini girin (İsteğe Bağlı)..." class="w-full bg-slate-900 border border-slate-600 p-2 rounded outline-none focus:border-cyan-400 text-xs" oninput="updatePreview()"></textarea></div>
+                
+                <!-- YENİ: RESİM YÜKLEME ALANI -->
+                <div class="mb-2 bg-slate-900 border border-slate-600 p-2 rounded flex items-center justify-between">
+                    <label class="text-[10px] text-slate-300">Soru Resmi (Opsiyonel):</label>
+                    <input type="file" id="resim_input" accept="image/*" class="text-[10px] text-slate-400 w-1/2" onchange="resimYukle(event)">
+                    <input type="hidden" id="resim_base64">
+                </div>
+
                 <div class="grid grid-cols-2 gap-1 mb-2 text-xs">
-                    <input type="text" id="secenek_A" placeholder="A Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_B" placeholder="B Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_C" placeholder="C Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_D" placeholder="D Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_E" placeholder="E Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded col-span-2">
+                    <input type="text" id="secenek_A" placeholder="A Şıkkı (Boş Kalabilir)" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_B" placeholder="B Şıkkı (Boş Kalabilir)" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_C" placeholder="C Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_D" placeholder="D Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded"><input type="text" id="secenek_E" placeholder="E Şıkkı" class="bg-slate-900 border border-slate-600 p-1.5 rounded col-span-2">
                 </div>
                 <div class="mb-2"><select id="dogru_cevap" class="w-full bg-slate-900 border border-green-600 p-1.5 rounded text-green-400 font-bold outline-none text-xs"><option value="A">Doğru Cevap: A</option><option value="B">Doğru Cevap: B</option><option value="C">Doğru Cevap: C</option><option value="D">Doğru Cevap: D</option><option value="E">Doğru Cevap: E</option></select></div>
                 <div class="flex gap-2">
                     <button onclick="kaydet()" class="flex-grow bg-cyan-600 hover:bg-cyan-500 p-2 rounded font-bold text-xs">SİSTEME YÜKLE</button>
-                    <button onclick="soruyuSil()" class="bg-red-900 hover:bg-red-700 text-white p-2 rounded font-bold text-xs border border-red-700">🗑️ SİL</button>
+                    <button onclick="soruyuSil()" class="bg-red-900 hover:bg-red-700 text-white p-2 rounded font-bold text-xs border border-red-700">🗑️ BU SORUYU SİL</button>
                 </div>
-                <div class="mt-2 border-t border-slate-700 pt-1"><div id="onizleme" class="bg-slate-900 p-2 border border-slate-700 rounded h-[50px] overflow-y-auto text-[10px] text-center text-slate-300">Önizleme...</div></div>
+                <div class="mt-2 border-t border-slate-700 pt-1"><div id="onizleme" class="bg-slate-900 p-2 border border-slate-700 rounded max-h-[120px] overflow-y-auto text-[10px] text-center text-slate-300">Önizleme...</div></div>
             </div>
         </div>
 
@@ -95,13 +111,13 @@
 
             <div class="flex-grow flex items-center justify-center pt-2">
                 <div class="map-container" id="harita-radar">
-                    <div id="radar-bolge-7" class="map-zone map-b7"><div class="text-[10px] font-bold text-slate-300 mb-1 text-shadow-hard">ANA REAKTÖR (B7)</div><div class="text-lg font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
-                    <div id="radar-bolge-5" class="map-zone map-b5"><div class="text-[9px] font-bold text-slate-300 mb-1 text-shadow-hard">SOL KORİDOR (B5)</div><div class="text-sm font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
-                    <div id="radar-bolge-6" class="map-zone map-b6"><div class="text-[9px] font-bold text-slate-300 mb-1 text-shadow-hard">SAĞ KORİDOR (B6)</div><div class="text-sm font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
-                    <div id="radar-bolge-1" class="map-zone map-b1"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">DIŞ SOL (B1)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
-                    <div id="radar-bolge-2" class="map-zone map-b2"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">İÇ SOL (B2)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
-                    <div id="radar-bolge-3" class="map-zone map-b3"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">İÇ SAĞ (B3)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
-                    <div id="radar-bolge-4" class="map-zone map-b4"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">DIŞ SAĞ (B4)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">0 DOĞRU</div></div>
+                    <div id="radar-bolge-7" class="map-zone map-b7"><div class="text-[10px] font-bold text-slate-300 mb-1 text-shadow-hard">ANA REAKTÖR (B7)</div><div class="text-lg font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
+                    <div id="radar-bolge-5" class="map-zone map-b5"><div class="text-[9px] font-bold text-slate-300 mb-1 text-shadow-hard">SOL KORİDOR (B5)</div><div class="text-sm font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
+                    <div id="radar-bolge-6" class="map-zone map-b6"><div class="text-[9px] font-bold text-slate-300 mb-1 text-shadow-hard">SAĞ KORİDOR (B6)</div><div class="text-sm font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
+                    <div id="radar-bolge-1" class="map-zone map-b1"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">DIŞ SOL (B1)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
+                    <div id="radar-bolge-2" class="map-zone map-b2"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">İÇ SOL (B2)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
+                    <div id="radar-bolge-3" class="map-zone map-b3"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">İÇ SAĞ (B3)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
+                    <div id="radar-bolge-4" class="map-zone map-b4"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">DIŞ SAĞ (B4)</div><div class="text-[10px] font-bold text-white text-shadow-hard bolge-isim">KİLİTLİ</div></div>
                 </div>
             </div>
         </div>
@@ -117,81 +133,58 @@
         const firebaseConfig = { apiKey: "AIzaSyBNNjeKMq9MkYcWn8wXK_Zye6M5qHG_G4k", authDomain: "yafl-tesis-34.firebaseapp.com", databaseURL: "https://yafl-tesis-34-default-rtdb.europe-west1.firebasedatabase.app", projectId: "yafl-tesis-34", storageBucket: "yafl-tesis-34.firebasestorage.app", messagingSenderId: "561962762810", appId: "1:561962762810:web:6aa5bcdbb2c08b6b232b03" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         
-        let globalMaxSoru = 6;
+        let isSavasBasladi = false; let isSavasBitti = false; let globalMaxSoru = 6;
         const bgRenkleriHex = { 1: '#3b82f6', 2: '#22c55e', 3: '#a855f7', 4: '#f97316' };
         const takimIsimleri = ["Alfa", "Beta", "Gama", "Delta"];
 
         window.onload = () => { soruyuGetir(); };
 
-        // Kapasite Dinleyici
-        db.ref('harita_durumu/genel').on('value', snap => {
-            const veri = snap.val() || {}; 
-            if(veri.max_soru) {
-                globalMaxSoru = veri.max_soru;
-                let sInput = document.getElementById('ayar_bolge_soru');
-                if(sInput && document.activeElement !== sInput) sInput.value = globalMaxSoru;
-                
-                let sOptions = ""; for(let i=1; i<=globalMaxSoru; i++) sOptions += `<option value="${i}">Soru ${i}</option>`;
-                let soruEl = document.getElementById('soru_no');
-                if(soruEl) { let val = soruEl.value; soruEl.innerHTML = sOptions; if(val && val <= globalMaxSoru) soruEl.value = val; }
-            }
-            
-            const btnStart = document.getElementById('btn-savas-baslat');
-            const btnEnd = document.getElementById('btn-savas-bitir');
-            
-            if(veri.savas_bitti) {
-                btnStart.innerText = "SAVAŞ BİTTİ (KAPALI)"; btnStart.className = "bg-slate-600 text-white text-xs font-bold py-2 px-4 rounded";
-            } else if(veri.savas_basladi) {
-                btnStart.innerText = "SAVAŞ DEVAM EDİYOR"; btnStart.className = "bg-green-400 text-slate-900 text-xs font-bold py-2 px-4 rounded animate-pulse";
-            } else {
-                btnStart.innerText = "2. SAVAŞI BAŞLAT"; btnStart.className = "bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded shadow-[0_0_10px_rgba(22,163,74,0.4)]";
-            }
-        });
-
-        function kapasiteAyarla() {
-            let sVal = parseInt(document.getElementById('ayar_bolge_soru').value);
-            if(sVal > 0) {
-                if(confirm(`Bölge Başı Soru Kapasitesi ${sVal} olarak güncellenecek ve SİSTEM SIFIRLANACAKTIR! Onaylıyor musunuz?`)) {
-                    db.ref('harita_durumu/genel').update({ max_soru: sVal, savas_basladi: false, savas_bitti: false });
-                    sistemiSifirlaIslemi(); alert("Kapasite ayarlandı!");
+        // YENİ: RESİM SIKIŞTIRMA VE ÇEVİRME (Canvas ile DB dostu yapar)
+        function resimYukle(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width; let h = img.height;
+                    const maxW = 800; // Maksimum genişlik sınırı
+                    if(w > maxW) { h = Math.round((maxW/w)*h); w = maxW; }
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const b64 = canvas.toDataURL('image/jpeg', 0.85);
+                    document.getElementById('resim_base64').value = b64;
+                    updatePreview();
                 }
+                img.src = e.target.result;
             }
+            reader.readAsDataURL(file);
         }
 
-        // LOBİ VE PERFORMANS TABLOSU
+        // --- LOBİ SİSTEMİ ---
         db.ref('lobi').on('value', snap => {
-            const oyuncular = snap.val() || {};
-            let html = ""; let kisiSayisi = 0; let perfHtml = "";
-            
+            const oyuncular = snap.val() || {}; let html = ""; let kisiSayisi = 0; let perfHtml = "";
             for(let key in oyuncular) {
-                kisiSayisi++;
-                let ogr = oyuncular[key];
-                let bgRenk = "bg-slate-700"; let takimYazisi = "Bekliyor";
+                kisiSayisi++; let ogr = oyuncular[key]; let bgRenk = "bg-slate-700"; let takimYazisi = "Bekliyor";
                 if(ogr.takim > 0) { 
                     takimYazisi = takimIsimleri[ogr.takim-1]; 
-                    if(ogr.takim==1) bgRenk = "bg-blue-600";
-                    if(ogr.takim==2) bgRenk = "bg-green-600";
-                    if(ogr.takim==3) bgRenk = "bg-purple-600";
-                    if(ogr.takim==4) bgRenk = "bg-orange-600";
+                    if(ogr.takim==1) bgRenk = "bg-blue-600"; if(ogr.takim==2) bgRenk = "bg-green-600";
+                    if(ogr.takim==3) bgRenk = "bg-purple-600"; if(ogr.takim==4) bgRenk = "bg-orange-600";
                 }
-                
                 html += `<div class="${bgRenk} text-white px-2 py-1 rounded text-[10px] flex gap-2 border border-slate-500 shadow-sm"><span class="font-bold">${ogr.isim}</span><span class="opacity-75">${takimYazisi}</span></div>`;
-                
-                if(ogr.takim > 0) {
-                    perfHtml += `<div class="bg-slate-900 border border-slate-700 p-1.5 rounded flex justify-between items-center text-[9px]"><span class="text-slate-300 font-bold truncate w-16">${ogr.isim} (${takimYazisi.substring(0,1)})</span><div><span class="text-green-400 mx-0.5">✓${ogr.dogru||0}</span></div></div>`;
-                }
+                if(ogr.takim > 0) perfHtml += `<div class="bg-slate-900 border border-slate-700 p-1.5 rounded flex justify-between items-center text-[9px]"><span class="text-slate-300 font-bold truncate w-16">${ogr.isim} (${takimYazisi.substring(0,1)})</span><div><span class="text-green-400 mx-0.5">✓${ogr.dogru||0}</span></div></div>`;
             }
             document.getElementById('lobi-liste').innerHTML = html || `<p class="text-xs text-slate-500 w-full text-center py-4">Kimse yok...</p>`;
-            document.getElementById('lobi-sayac').innerText = `${kisiSayisi} Kişi`;
-            document.getElementById('performans-tablosu').innerHTML = perfHtml;
+            document.getElementById('lobi-sayac').innerText = `${kisiSayisi} Kişi`; document.getElementById('performans-tablosu').innerHTML = perfHtml;
         });
 
         function takimlariKur() {
             db.ref('lobi').once('value').then(snap => {
                 let oyuncular = snap.val() || {}; let keys = Object.keys(oyuncular);
                 if(keys.length === 0) { alert("Lobide kimse yok!"); return; }
-                keys.sort(() => Math.random() - 0.5);
-                let takimIndex = 1; let updates = {};
+                keys.sort(() => Math.random() - 0.5); let takimIndex = 1; let updates = {};
                 keys.forEach(k => { updates[`${k}/takim`] = takimIndex; takimIndex++; if(takimIndex > 4) takimIndex = 1; });
                 db.ref('lobi').update(updates).then(() => { alert("Öğrenciler takımlara eşit dağıtıldı! Savaşı başlatabilirsiniz."); });
             });
@@ -202,56 +195,105 @@
                 db.ref('harita_durumu/genel').update({ savas_basladi: true, savas_bitti: false });
             }
         }
-        
         function savasiBitir() { if(confirm("Savaşı tamamen bitir?")) db.ref('harita_durumu/genel').update({ savas_basladi: false, savas_bitti: true }); }
         
         function sistemiSifirla() {
-            if(confirm("DİKKAT: Öğrenciler dahil TÜM SİSTEM sıfırlanacak. Emin misiniz?")) { sistemiSifirlaIslemi(); }
+            if(confirm("DİKKAT: Öğrenciler dahil TÜM SİSTEM sıfırlanacak. Emin misiniz?")) {
+                db.ref('lobi').remove(); let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { dogrular: {1:0,2:0,3:0,4:0}, fetheden_takim: 0 }; }
+                db.ref('harita_durumu').set({ genel: { savas_basladi: false, savas_bitti: false }, bolgeler: bolgeler });
+            }
         }
         
-        function sistemiSifirlaIslemi() {
-            db.ref('lobi').remove();
-            let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { dogrular: {1:0,2:0,3:0,4:0} }; }
-            db.ref('harita_durumu/bolgeler').set(bolgeler);
-            db.ref('harita_durumu/genel').update({ savas_basladi: false, savas_bitti: false });
+        function kapasiteAyarla() {
+            let sVal = parseInt(document.getElementById('ayar_bolge_soru').value);
+            if(sVal > 0) {
+                if(confirm(`Bölge Başı Soru Kapasitesi ${sVal} olarak ayarlanacak ve sistem sıfırlanacak. Onaylıyor musunuz?`)) {
+                    db.ref('harita_durumu/genel/max_soru').set(sVal);
+                    sistemiSifirla(); alert("Kapasite ayarlandı!");
+                }
+            }
         }
 
-        // HARİTA ÇİZİMİ (TÜM BÖLGELERDEKİ DOĞRULARI GÖSTERİR)
+        db.ref('harita_durumu/genel').on('value', snap => {
+            const veri = snap.val() || {}; isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false;
+            if(veri.max_soru) {
+                globalMaxSoru = veri.max_soru;
+                let sOptions = ""; for(let i=1; i<=globalMaxSoru; i++) sOptions += `<option value="${i}">Soru ${i}</option>`;
+                let soruEl = document.getElementById('soru_no'); if(soruEl) { let val = soruEl.value; soruEl.innerHTML = sOptions; if(val && val <= globalMaxSoru) soruEl.value = val; }
+            }
+            const btnStart = document.getElementById('btn-savas-baslat'); const btnEnd = document.getElementById('btn-savas-bitir');
+            if(isSavasBitti) { btnStart.innerText = "SAVAŞ BİTTİ"; btnStart.className = "bg-slate-600 text-white text-xs font-bold py-2 px-4 rounded"; } 
+            else if(isSavasBasladi) { btnStart.innerText = "SAVAŞ DEVAM EDİYOR"; btnStart.className = "bg-green-400 text-slate-900 text-xs font-bold py-2 px-4 rounded animate-pulse"; } 
+            else { btnStart.innerText = "2. SAVAŞI BAŞLAT"; btnStart.className = "bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded shadow-[0_0_10px_rgba(22,163,74,0.4)]"; }
+        });
+
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`radar-bolge-${i}`); if(!btn) continue;
                 const isimDiv = btn.querySelector('.bolge-isim');
-                const data = bolgeler[`bolge_${i}`] || { dogrular: {} };
-                
-                let t1 = data.dogrular?.[1] || 0; let t2 = data.dogrular?.[2] || 0;
-                let t3 = data.dogrular?.[3] || 0; let t4 = data.dogrular?.[4] || 0;
+                const data = bolgeler[`bolge_${i}`] || { dogrular: {}, fetheden_takim: 0 };
+                let t1 = data.dogrular?.[1] || 0; let t2 = data.dogrular?.[2] || 0; let t3 = data.dogrular?.[3] || 0; let t4 = data.dogrular?.[4] || 0;
                 let totalHits = t1 + t2 + t3 + t4;
                 
-                isimDiv.innerText = `${totalHits} DOĞRU`;
-                if(totalHits > 0) {
-                    let p1 = (t1 / totalHits) * 100; let p2 = p1 + (t2 / totalHits) * 100; let p3 = p2 + (t3 / totalHits) * 100;
-                    btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
-                } else { btn.style.background = '#1e293b'; } 
+                if(data.fetheden_takim > 0) {
+                    btn.style.background = bgRenkleriHex[data.fetheden_takim]; btn.classList.add('zone-conquered'); isimDiv.innerText = `FETHEDİLDİ`;
+                } else if(isSavasBasladi) {
+                    isimDiv.innerText = `${totalHits} DOĞRU`;
+                    if(totalHits > 0) {
+                        let p1 = (t1 / totalHits) * 100; let p2 = p1 + (t2 / totalHits) * 100; let p3 = p2 + (t3 / totalHits) * 100;
+                        btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
+                    } else { btn.style.background = '#0f172a'; } 
+                    btn.style.border = "2px solid #ef4444";
+                } else {
+                    btn.style.background = '#1e293b'; btn.style.border = "2px solid #475569"; isimDiv.innerText = "BEKLEMEDE";
+                }
             }
         });
 
-        // Soru Form İşlemleri
+        // YENİ: RESİMLİ SORU YÖNETİMİ
         function soruyuGetir() {
             const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value;
             db.ref(`sorular/bolge_${b}/soru_${s}`).once('value').then((snap) => {
-                const veri = snap.val() || {}; document.getElementById('soru_metni').value = veri.soru_metni || ""; document.getElementById('secenek_A').value = veri.secenekler?.A || ""; document.getElementById('secenek_B').value = veri.secenekler?.B || ""; document.getElementById('secenek_C').value = veri.secenekler?.C || ""; document.getElementById('secenek_D').value = veri.secenekler?.D || ""; document.getElementById('secenek_E').value = veri.secenekler?.E || ""; document.getElementById('dogru_cevap').value = veri.dogru_cevap || "A"; updatePreview();
+                const veri = snap.val() || {}; 
+                document.getElementById('soru_metni').value = veri.soru_metni || ""; 
+                document.getElementById('resim_base64').value = veri.resim || "";
+                document.getElementById('resim_input').value = ""; // Inputu temizle
+                document.getElementById('secenek_A').value = veri.secenekler?.A || ""; document.getElementById('secenek_B').value = veri.secenekler?.B || ""; document.getElementById('secenek_C').value = veri.secenekler?.C || ""; document.getElementById('secenek_D').value = veri.secenekler?.D || ""; document.getElementById('secenek_E').value = veri.secenekler?.E || ""; 
+                document.getElementById('dogru_cevap').value = veri.dogru_cevap || "A"; updatePreview();
             });
         }
-        function updatePreview() { const text = document.getElementById('soru_metni').value; document.getElementById('onizleme').innerHTML = text.replace(/\n/g, '<br>'); try { renderMathInElement(document.getElementById('onizleme'), { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] }); } catch(e) {} }
+        function updatePreview() { 
+            const text = document.getElementById('soru_metni').value; 
+            const imgData = document.getElementById('resim_base64').value;
+            let p = text.replace(/\n/g, '<br>');
+            if(imgData) p += `<br><img src="${imgData}" style="max-width:100%; border-radius:4px; margin-top:5px;">`;
+            document.getElementById('onizleme').innerHTML = p; 
+            try { renderMathInElement(document.getElementById('onizleme'), { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] }); } catch(e) {} 
+        }
         function kaydet() {
             const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value;
-            const veri = { soru_metni: document.getElementById('soru_metni').value, secenekler: { A: document.getElementById('secenek_A').value, B: document.getElementById('secenek_B').value, C: document.getElementById('secenek_C').value, D: document.getElementById('secenek_D').value, E: document.getElementById('secenek_E').value }, dogru_cevap: document.getElementById('dogru_cevap').value };
-            db.ref(`sorular/bolge_${b}/soru_${s}`).set(veri).then(() => { alert("Kaydedildi!"); });
+            const veri = { 
+                soru_metni: document.getElementById('soru_metni').value, 
+                resim: document.getElementById('resim_base64').value, // Resim de kaydediliyor
+                secenekler: { A: document.getElementById('secenek_A').value, B: document.getElementById('secenek_B').value, C: document.getElementById('secenek_C').value, D: document.getElementById('secenek_D').value, E: document.getElementById('secenek_E').value }, 
+                dogru_cevap: document.getElementById('dogru_cevap').value 
+            };
+            db.ref(`sorular/bolge_${b}/soru_${s}`).set(veri).then(() => { alert("Soru başarıyla kaydedildi!"); });
         }
         function soruyuSil() { const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value; if(confirm(`Emin misiniz?`)) { db.ref(`sorular/bolge_${b}/soru_${s}`).remove().then(() => { soruyuGetir(); }); } }
+        
+        // YENİ: TÜM SORULARI SİL BUTONU FONKSİYONU
+        function tumSorulariSil() {
+            if(confirm("DİKKAT: Veritabanındaki TÜM BÖLGELERDEKİ TÜM MÜHİMMATLAR (SORULAR) KÖKTEN SİLİNECEK! Geri dönüşü yoktur. Onaylıyor musunuz?")) {
+                db.ref('sorular').remove().then(() => {
+                    alert("Tüm soru arşivi temizlendi.");
+                    soruyuGetir();
+                });
+            }
+        }
 
-        function pdfIndir() { /* Klasik Pdf Indirici */ 
+        function pdfIndir() { 
              db.ref('sorular').once('value').then(snap => {
                 const data = snap.val(); if(!data) return;
                 let html = "<div style='padding:20px; font-family:Arial, sans-serif;'><h2 style='text-align:center; color:#333; margin-bottom:15px; border-bottom:2px solid #ccc; padding-bottom:10px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
@@ -260,7 +302,11 @@
                         html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
                         for(let s=1; s<=globalMaxSoru; s++){
                              let soru = data[`bolge_${b}`][`soru_${s}`];
-                             if(soru) html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'><p style='margin-top:0; font-size:14px;'><b>Soru ${s}:</b> ${soru.soru_metni}</p><ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'><li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li><li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
+                             if(soru) {
+                                 html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'><p style='margin-top:0; font-size:14px;'><b>Soru ${s}:</b> ${soru.soru_metni}</p>`;
+                                 if(soru.resim) html += `<div style='text-align:center;'><img src="${soru.resim}" style="max-width:100%; max-height:200px; margin:10px 0; border-radius:4px;"></div>`;
+                                 html += `<ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'><li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li><li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
+                             }
                         }
                         html += `</div>`;
                     }
