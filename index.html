@@ -50,7 +50,7 @@
         <p class="text-sm text-slate-400 mb-6">Komuta merkezinden Savaş İzni bekleniyor...</p>
         
         <div class="w-full bg-slate-900 p-4 rounded border border-slate-700">
-            <h3 class="text-xs text-cyan-400 font-bold mb-3" id="lobi-text">0 / X Komutan Bağlandı</h3>
+            <h3 class="text-xs text-cyan-400 font-bold mb-3" id="lobi-text">0 / X Savaşçı Bağlandı</h3>
             <div id="lobi-container" class="flex flex-col gap-2 w-full"></div>
         </div>
     </div>
@@ -113,7 +113,8 @@
         const firebaseConfig = { apiKey: "AIzaSyBNNjeKMq9MkYcWn8wXK_Zye6M5qHG_G4k", authDomain: "yafl-tesis-34.firebaseapp.com", databaseURL: "https://yafl-tesis-34-default-rtdb.europe-west1.firebasedatabase.app", projectId: "yafl-tesis-34", storageBucket: "yafl-tesis-34.firebasestorage.app", messagingSenderId: "561962762810", appId: "1:561962762810:web:6aa5bcdbb2c08b6b232b03" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
 
-        let globalMaxBatarya = 6;
+        let globalMaxUye = 6;
+        let globalMaxSoru = 6;
         let aktifTakim = ""; let aktifTerminal = ""; let ogrenciIsmi = ""; 
         let seciliBolge = null; let aktifAtisSoruNo = 1; 
         let dogruCevap = ""; let isSavasBasladi = false; let isSavasBitti = false;
@@ -125,7 +126,13 @@
         const bgRenkleriClasses = { takim_1: 'bg-blue-500', takim_2: 'bg-green-500', takim_3: 'bg-purple-500', takim_4: 'bg-orange-500' };
         const takimIsimleri = ["ALFA", "BETA", "GAMA", "DELTA"];
 
-        db.ref('harita_durumu/genel/max_batarya').on('value', snap => { if(snap.exists()) globalMaxBatarya = snap.val(); });
+        db.ref('harita_durumu/genel').on('value', snap => {
+            const veri = snap.val() || {}; 
+            isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false;
+            if(veri.max_uye) globalMaxUye = veri.max_uye;
+            if(veri.max_soru) globalMaxSoru = veri.max_soru;
+            ekranGuncelle();
+        });
 
         function sistemeBaglan() {
             const girilenSifre = document.getElementById('ogrenci-sifre').value.trim();
@@ -159,12 +166,12 @@
             });
         }
 
-        // LOBİ ÇİZİMİ (ÖĞRENCİ KİLİT EKRANI İÇİN)
+        // ÖĞRENCİ LOBİ ÇİZİMİ (max_uye kullanılarak)
         db.ref('oyun_durumu/takimlar').on('value', snap => {
-            const takimlar = snap.val() || {}; let lobiHtml = ""; let aktifSayisi = 0; let toplamKapasite = 4 * globalMaxBatarya;
+            const takimlar = snap.val() || {}; let lobiHtml = ""; let aktifSayisi = 0; let toplamKapasite = 4 * globalMaxUye;
             for(let t=1; t<=4; t++) {
                 lobiHtml += `<div class="flex items-center gap-2 justify-center"><span class="text-[9px] text-slate-400 w-10 text-right">${takimIsimleri[t-1]}</span><div class="flex gap-1 flex-wrap justify-start">`;
-                for(let term=1; term<=globalMaxBatarya; term++) {
+                for(let term=1; term<=globalMaxUye; term++) {
                     const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
                     let bgRenk = "bg-slate-800"; let elendiKip = "";
                     if(ogr) {
@@ -188,17 +195,15 @@
             else { kilitEkrani.classList.add('hidden'); kilitEkrani.classList.remove('flex'); karneEkrani.classList.add('hidden'); karneEkrani.classList.remove('flex'); mainScreen.classList.remove('hidden'); mainScreen.classList.add('flex'); }
         }
 
-        db.ref('harita_durumu/genel').on('value', snap => { const veri = snap.val() || {}; isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false; ekranGuncelle(); });
-
-        // FETİH RENKLENDİRME VE KALKAN
+        // FETİH RENKLENDİRME MOTORU (max_soru kullanılarak)
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`btn-bolge-${i}`); if(!btn) continue;
                 const hpGosterge = btn.querySelector('.hp-gosterge');
-                const data = bolgeler[`bolge_${i}`] || { hp: globalMaxBatarya, vuruslar: {} };
+                const data = bolgeler[`bolge_${i}`] || { hp: globalMaxSoru, vuruslar: {} };
                 
-                let currentHp = data.hp !== undefined ? data.hp : globalMaxBatarya;
+                let currentHp = data.hp !== undefined ? data.hp : globalMaxSoru;
                 bolgeCanlari[i] = currentHp; 
                 
                 let t1 = data.vuruslar?.takim_1 || 0; let t2 = data.vuruslar?.takim_2 || 0;
@@ -211,7 +216,7 @@
                     if(t3 > max) { max = t3; winner = 'takim_3'; } if(t4 > max) { max = t4; winner = 'takim_4'; }
                     btn.style.background = bgRenkleriHex[winner] || '#475569'; btn.classList.add('zone-conquered'); hpGosterge.innerText = `FETHEDİLDİ`;
                 } else {
-                    hpGosterge.innerText = `${totalHits} / ${globalMaxBatarya} VURUŞ`;
+                    hpGosterge.innerText = `${totalHits} / ${globalMaxSoru} VURUŞ`;
                     if(totalHits > 0) {
                         let p1 = (t1 / totalHits) * 100; let p2 = p1 + (t2 / totalHits) * 100; let p3 = p2 + (t3 / totalHits) * 100;
                         btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
@@ -231,12 +236,11 @@
             
             if(seciliBolge) document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili');
             
-            // YENİ: Öğrencinin o bölgede henüz çözmediği ilk soruyu bul
             let cozulmusler = cozulmusSorular[`bolge_${bolgeNo}`] || {};
-            if(cozulmusler === true) cozulmusler = { soru_1: true }; // Eski kalıntılar için
+            if(cozulmusler === true) cozulmusler = { soru_1: true };
 
             let siradakiSoru = 0;
-            for(let i=1; i<=globalMaxBatarya; i++) {
+            for(let i=1; i<=globalMaxSoru; i++) {
                 if(!cozulmusler[`soru_${i}`]) { siradakiSoru = i; break; }
             }
             
@@ -268,11 +272,10 @@
                 
                 skorDogru++; userRef.update({ dogru: skorDogru, cozulen_bolgeler: cozulmusSorular });
                 
-                // Mermilerin Güvenli Düşüşü (Transaction)
                 const bolgeRef = db.ref(`harita_durumu/bolgeler/bolge_${seciliBolge}`);
                 bolgeRef.transaction((data) => {
-                    if (data === null) data = { hp: globalMaxBatarya, vuruslar: {} };
-                    if (data.hp === undefined) data.hp = globalMaxBatarya;
+                    if (data === null) data = { hp: globalMaxSoru, vuruslar: {} };
+                    if (data.hp === undefined) data.hp = globalMaxSoru;
                     if (data.hp > 0) {
                         data.hp -= 1; let takimKey = `takim_${aktifTakim}`;
                         if (!data.vuruslar) data.vuruslar = {};
@@ -316,7 +319,7 @@
                 for(let b=1; b<=7; b++){
                     if(data[`bolge_${b}`]){
                         html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
-                        for(let s=1; s<=globalMaxBatarya; s++){
+                        for(let s=1; s<=globalMaxSoru; s++){
                              let soru = data[`bolge_${b}`][`soru_${s}`];
                              if(soru) {
                                  html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'><p style='margin-top:0; font-size:14px;'><b>Batarya ${s}:</b> ${soru.soru_metni}</p><ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'><li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li><li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
