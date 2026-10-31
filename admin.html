@@ -21,7 +21,6 @@
         .map-b2 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 26%; width: 22%; height: 25%; padding-top:15%; }
         .map-b3 { clip-path: polygon(0% 0%, 100% 20%, 80% 100%, 0% 100%); top: 72%; left: 52%; width: 22%; height: 25%; padding-top:15%; }
         .map-b4 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 76%; width: 22%; height: 25%; padding-top:15%; }
-        
         .zone-conquered { border: 3px solid #ffffff !important; box-shadow: 0 0 20px rgba(255,255,255,0.8); z-index: 10; }
         .vurus-bar { width: 60%; height: 6px; background: #0f172a; margin-top: 5px; border-radius: 3px; display: flex; overflow: hidden; }
     </style>
@@ -43,27 +42,34 @@
     </header>
     
     <div class="flex flex-col xl:flex-row gap-6 flex-grow">
-        
         <!-- SOL PANEL -->
         <div class="w-full xl:w-5/12 flex flex-col gap-6">
+            
             <div class="bg-slate-800 p-5 rounded border border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.2)]">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-3">
                     <h2 class="text-base text-blue-400 font-bold">👨‍🚀 Komutan Tanımla</h2>
                     <button onclick="tumSinifiSil()" class="text-[10px] text-red-400 hover:text-red-300 underline">Tüm Kayıtları Temizle</button>
                 </div>
                 
-                <!-- YENİ: DİNAMİK KAPASİTE AYARI -->
-                <div class="flex justify-between items-center bg-slate-900 p-2 rounded mb-3 border border-slate-600">
-                    <span class="text-[10px] text-slate-300">Batarya Kapasitesi (Bölge Başı Soru):</span>
-                    <div class="flex gap-2">
-                        <input type="number" id="ayar_kapasite" class="w-12 bg-slate-800 border border-slate-500 rounded text-center text-white text-xs outline-none" value="6" min="1" max="30">
-                        <button onclick="kapasiteAyarla()" class="bg-cyan-700 hover:bg-cyan-600 text-white text-[10px] font-bold px-2 py-1 rounded">UYGULA</button>
+                <!-- YENİ: ÇİFTLİ KAPASİTE AYARI -->
+                <div class="flex flex-col gap-2 bg-slate-900 p-3 rounded mb-4 border border-slate-600">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] text-slate-300">Takım Başı Üye (Savaşçı):</span>
+                        <input type="number" id="ayar_takim_uyesi" class="w-14 bg-slate-800 border border-slate-500 rounded text-center text-white text-xs outline-none p-1" value="6" min="1" max="30">
                     </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] text-slate-300">Bölge Başı Soru (Mühimmat):</span>
+                        <input type="number" id="ayar_bolge_soru" class="w-14 bg-slate-800 border border-slate-500 rounded text-center text-white text-xs outline-none p-1" value="6" min="1" max="30">
+                    </div>
+                    <button onclick="kapasiteAyarla()" class="bg-cyan-700 hover:bg-cyan-600 text-white text-[11px] font-bold px-2 py-1.5 rounded mt-1">AYARLARI UYGULA VE SİSTEMİ SIFIRLA</button>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="ata_takim" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"><option value="1">Takım 1 (Alfa)</option><option value="2">Takım 2 (Beta)</option><option value="3">Takım 3 (Gama)</option><option value="4">Takım 4 (Delta)</option></select>
-                    <select id="ata_terminal" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"></select>
+                    <!-- Varsayılan değerler eklendi (Hata düzeltmesi) -->
+                    <select id="ata_terminal" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none">
+                        <option value="1">Batarya 1</option><option value="2">Batarya 2</option><option value="3">Batarya 3</option><option value="4">Batarya 4</option><option value="5">Batarya 5</option><option value="6">Batarya 6</option>
+                    </select>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <input type="text" id="ata_isim" placeholder="Öğrenci Adı" class="bg-slate-900 border border-slate-600 p-2 rounded text-white text-sm outline-none">
@@ -79,7 +85,10 @@
                 </h2>
                 <div class="grid grid-cols-2 gap-4 mb-3">
                     <select id="bolge" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"><option value="1">Bölge 1</option><option value="2">Bölge 2</option><option value="3">Bölge 3</option><option value="4">Bölge 4</option><option value="5">Bölge 5</option><option value="6">Bölge 6</option><option value="7">Bölge 7 (Reaktör)</option></select>
-                    <select id="soru_no" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none"></select>
+                    <!-- Varsayılan değerler eklendi -->
+                    <select id="soru_no" onchange="soruyuGetir()" class="bg-slate-900 border border-slate-600 p-2 rounded text-slate-300 text-sm outline-none">
+                        <option value="1">Soru 1</option><option value="2">Soru 2</option><option value="3">Soru 3</option><option value="4">Soru 4</option><option value="5">Soru 5</option><option value="6">Soru 6</option>
+                    </select>
                 </div>
                 <div class="mb-3"><textarea id="soru_metni" rows="2" placeholder="Soru metnini girin..." class="w-full bg-slate-900 border border-slate-600 p-2 rounded outline-none focus:border-cyan-400 text-sm" oninput="updatePreview()"></textarea></div>
                 <div class="grid grid-cols-2 gap-2 mb-3 text-sm">
@@ -104,7 +113,6 @@
                 <button onclick="haritayiSifirlaCagrisi()" class="text-xs bg-red-900 hover:bg-red-700 text-white py-1 px-3 rounded">PUAN/HARİTA SIFIRLA</button>
             </div>
             
-            <!-- YENİ: LOBİ GÖRÜNÜMÜ (Öğretmen İçin) -->
             <div class="mb-4 bg-slate-900 p-3 rounded border border-slate-700">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-xs text-cyan-400 font-bold">Bekleme Lobisi (Canlı)</span>
@@ -139,26 +147,30 @@
         const firebaseConfig = { apiKey: "AIzaSyBNNjeKMq9MkYcWn8wXK_Zye6M5qHG_G4k", authDomain: "yafl-tesis-34.firebaseapp.com", databaseURL: "https://yafl-tesis-34-default-rtdb.europe-west1.firebasedatabase.app", projectId: "yafl-tesis-34", storageBucket: "yafl-tesis-34.firebasestorage.app", messagingSenderId: "561962762810", appId: "1:561962762810:web:6aa5bcdbb2c08b6b232b03" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         
-        let globalMaxBatarya = 6;
+        let globalMaxUye = 6;
+        let globalMaxSoru = 6;
         let isSavasBasladi = false; let isSavasBitti = false;
+        
         const bgRenkleriHex = { takim_1: '#3b82f6', takim_2: '#22c55e', takim_3: '#a855f7', takim_4: '#f97316' };
         const bgRenkleriClasses = { takim_1: 'bg-blue-500', takim_2: 'bg-green-500', takim_3: 'bg-purple-500', takim_4: 'bg-orange-500' };
         const takimIsimleri = ["ALFA", "BETA", "GAMA", "DELTA"];
 
-        window.onload = () => { soruyuGetir(); };
+        window.onload = () => { buildTerminalDropdowns(); setTimeout(() => soruyuGetir(), 500); };
 
-        // 1. DİNAMİK KAPASİTE DİNLEYİCİSİ VE DROPDOWN OLUŞTURUCU
         db.ref('harita_durumu/genel').on('value', snap => {
             const veri = snap.val() || {}; 
             isSavasBasladi = veri.savas_basladi || false; 
             isSavasBitti = veri.savas_bitti || false;
             
-            if(veri.max_batarya) {
-                globalMaxBatarya = veri.max_batarya;
-                let kapInput = document.getElementById('ayar_kapasite');
-                if(kapInput && document.activeElement !== kapInput) kapInput.value = globalMaxBatarya;
-                buildTerminalDropdowns();
-            }
+            if(veri.max_uye) globalMaxUye = veri.max_uye;
+            if(veri.max_soru) globalMaxSoru = veri.max_soru;
+            
+            let uInput = document.getElementById('ayar_takim_uyesi');
+            let sInput = document.getElementById('ayar_bolge_soru');
+            if(uInput && document.activeElement !== uInput) uInput.value = globalMaxUye;
+            if(sInput && document.activeElement !== sInput) sInput.value = globalMaxSoru;
+            
+            buildTerminalDropdowns();
 
             const btn = document.getElementById('btn-savas-baslat'); const gosterge = document.getElementById('savas-durum-gosterge');
             if(isSavasBitti) { btn.innerText = "SAVAŞ BİTTİ"; btn.className = "bg-slate-600 text-white text-sm font-bold py-2 px-6 rounded cursor-not-allowed"; gosterge.innerText = "SAVAŞ SONA ERDİ"; gosterge.className = "text-purple-400 font-bold ml-2"; }
@@ -166,26 +178,26 @@
             else { btn.innerText = "SAVAŞI BAŞLAT"; btn.className = "bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-2 px-6 rounded"; gosterge.innerText = "ATEŞKES (BEKLİYOR)"; gosterge.className = "text-yellow-400 font-bold ml-2"; }
         });
 
+        // HATA DÜZELTME: Dropdownlar boş kalmasın
         function buildTerminalDropdowns() {
-            let options = "";
-            for(let i=1; i<=globalMaxBatarya; i++) { options += `<option value="${i}">Batarya ${i}</option>`; }
-            ['ata_terminal', 'soru_no'].forEach(id => {
-                let el = document.getElementById(id);
-                if(el) {
-                    let val = el.value;
-                    el.innerHTML = id === 'soru_no' ? options.replace(/Batarya/g, "Soru") : options;
-                    if(val && val <= globalMaxBatarya) el.value = val;
-                }
-            });
+            let uOptions = ""; for(let i=1; i<=globalMaxUye; i++) uOptions += `<option value="${i}">Batarya ${i}</option>`;
+            let sOptions = ""; for(let i=1; i<=globalMaxSoru; i++) sOptions += `<option value="${i}">Soru ${i}</option>`;
+            
+            let termEl = document.getElementById('ata_terminal');
+            if(termEl) { let val = termEl.value; termEl.innerHTML = uOptions; if(val && val <= globalMaxUye) termEl.value = val; }
+            
+            let soruEl = document.getElementById('soru_no');
+            if(soruEl) { let val = soruEl.value; soruEl.innerHTML = sOptions; if(val && val <= globalMaxSoru) soruEl.value = val; }
         }
 
         function kapasiteAyarla() {
-            let val = parseInt(document.getElementById('ayar_kapasite').value);
-            if(val > 0 && val <= 30) {
-                if(confirm(`Kapasite ${val} olarak güncellenecek ve HARİTA SIFIRLANACAKTIR! (Öğrenci Şifreleri korunur). Onaylıyor musunuz?`)) {
-                    globalMaxBatarya = val;
-                    db.ref('harita_durumu/genel').update({ max_batarya: val, savas_basladi: false, savas_bitti: false });
-                    let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { hp: val, vuruslar: {} }; }
+            let uVal = parseInt(document.getElementById('ayar_takim_uyesi').value);
+            let sVal = parseInt(document.getElementById('ayar_bolge_soru').value);
+            if(uVal > 0 && sVal > 0) {
+                if(confirm(`Öğrenci: ${uVal} | Soru: ${sVal} olarak güncellenecek ve HARİTA SIFIRLANACAKTIR! (Şifreler korunur). Onaylıyor musunuz?`)) {
+                    globalMaxUye = uVal; globalMaxSoru = sVal;
+                    db.ref('harita_durumu/genel').update({ max_uye: uVal, max_soru: sVal, savas_basladi: false, savas_bitti: false });
+                    let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { hp: sVal, vuruslar: {} }; }
                     db.ref('harita_durumu/bolgeler').set(bolgeler);
                     sifirlaIslemi(); alert("Kapasite ayarlandı ve harita sıfırlandı!");
                 }
@@ -194,7 +206,7 @@
 
         function haritayiSifirlaCagrisi() {
             if(confirm("Harita ve Puanlar sıfırlanacak. (ŞİFRELER KALACAK). Onaylıyor musunuz?")) {
-                let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { hp: globalMaxBatarya, vuruslar: {} }; }
+                let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { hp: globalMaxSoru, vuruslar: {} }; }
                 db.ref('harita_durumu/bolgeler').set(bolgeler);
                 db.ref('harita_durumu/genel').update({ savas_basladi: false, savas_bitti: false });
                 sifirlaIslemi();
@@ -225,22 +237,17 @@
         function savasiBaslatToggle() { if(!isSavasBitti) db.ref('harita_durumu/genel/savas_basladi').set(!isSavasBasladi); }
         function savasiBitir() { if(confirm("Savaşı bitir?")) db.ref('harita_durumu/genel').set({ savas_basladi: false, savas_bitti: true }); }
 
-        // 2. YENİ LOBİ ÇİZİMİ VE PERFORMANS TABLOSU
+        // LOBİ ÇİZİMİ
         db.ref('oyun_durumu/takimlar').on('value', snap => {
-            const takimlar = snap.val() || {}; 
-            let html = ""; let lobiHtml = ""; let aktifSayisi = 0; let toplamKapasite = 4 * globalMaxBatarya;
-
-            // Lobi Çizimi (Grid)
+            const takimlar = snap.val() || {}; let html = ""; let lobiHtml = ""; let aktifSayisi = 0; let toplamKapasite = 4 * globalMaxUye;
             for(let t=1; t<=4; t++) {
                 lobiHtml += `<div class="flex items-center gap-2 justify-center"><span class="text-[9px] text-slate-400 w-10 text-right">${takimIsimleri[t-1]}</span><div class="flex gap-1 flex-wrap justify-start">`;
-                for(let term=1; term<=globalMaxBatarya; term++) {
+                for(let term=1; term<=globalMaxUye; term++) {
                     const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
                     let bgRenk = "bg-slate-800"; let elendiKip = "";
                     if(ogr) {
                         if(ogr.durum === "aktif") { bgRenk = bgRenkleriClasses[`takim_${t}`]; aktifSayisi++; }
                         if(ogr.elendi) { bgRenk = "bg-red-600 opacity-50"; elendiKip = `<span class="text-[8px] font-bold text-white">X</span>`; }
-                        
-                        // Performans Tablosu Eklemesi
                         let elendiUyari = ogr.elendi ? "<span class='text-red-500 text-[10px] ml-1'>(ELENDİ)</span>" : "";
                         html += `<div class="bg-slate-900 border ${ogr.elendi ? 'border-red-600 opacity-50' : 'border-slate-700'} p-2 rounded flex justify-between items-center text-xs"><span class="text-slate-300 font-bold">${ogr.isim} (T${t}-B${term}) ${elendiUyari}</span><div><span class="text-green-400 mx-1">✓ ${ogr.dogru || 0}</span><span class="text-red-400 mx-1">✗ ${ogr.yanlis || 0}</span></div></div>`;
                     }
@@ -248,52 +255,45 @@
                 }
                 lobiHtml += `</div></div>`;
             }
-            
             document.getElementById('admin-lobi-container').innerHTML = lobiHtml;
             document.getElementById('admin-lobi-text').innerText = `${aktifSayisi} / ${toplamKapasite} Bağlandı`;
             document.getElementById('performans-tablosu').innerHTML = html;
         });
 
-        // 3. YENİ: FETİH (ÇOĞUNLUK) BÖLGE RENKLENDİRME MOTORU
+        // FETİH RENKLENDİRME MOTORU (max_soru kullanılarak)
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`radar-bolge-${i}`); if(!btn) continue;
                 const hpGosterge = btn.querySelector('.hp-gosterge'); const vurusBar = btn.querySelector('.vurus-bar');
-                const data = bolgeler[`bolge_${i}`] || { hp: globalMaxBatarya, vuruslar: {} };
-                let currentHp = data.hp !== undefined ? data.hp : globalMaxBatarya;
+                const data = bolgeler[`bolge_${i}`] || { hp: globalMaxSoru, vuruslar: {} };
+                let currentHp = data.hp !== undefined ? data.hp : globalMaxSoru;
                 
                 let t1 = data.vuruslar?.takim_1 || 0; let t2 = data.vuruslar?.takim_2 || 0;
                 let t3 = data.vuruslar?.takim_3 || 0; let t4 = data.vuruslar?.takim_4 || 0;
                 let totalHits = t1 + t2 + t3 + t4;
                 
                 if(currentHp <= 0) {
-                    // FETİH: En çok vuranı bul
                     let max = 0; let winner = "";
                     if(t1 > max) { max = t1; winner = 'takim_1'; }
                     if(t2 > max) { max = t2; winner = 'takim_2'; }
                     if(t3 > max) { max = t3; winner = 'takim_3'; }
                     if(t4 > max) { max = t4; winner = 'takim_4'; }
-                    
                     btn.style.background = bgRenkleriHex[winner] || '#475569';
-                    btn.classList.add('zone-conquered');
-                    hpGosterge.innerText = `FETHEDİLDİ`;
-                    vurusBar.innerHTML = "";
+                    btn.classList.add('zone-conquered'); hpGosterge.innerText = `FETHEDİLDİ`; vurusBar.innerHTML = "";
                 } else {
-                    hpGosterge.innerText = `${totalHits} / ${globalMaxBatarya} VURUŞ`;
+                    hpGosterge.innerText = `${totalHits} / ${globalMaxSoru} VURUŞ`;
                     if(totalHits > 0) {
                         let p1 = (t1 / totalHits) * 100; let p2 = p1 + (t2 / totalHits) * 100; let p3 = p2 + (t3 / totalHits) * 100;
                         btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
                     } else { btn.style.background = '#1e293b'; }
                     btn.classList.remove('zone-conquered');
-                    // Vurus Barı (Gradyan Altında Kalınlığı)
                     vurusBar.innerHTML = "";
-                    if(totalHits > 0) { for(let takim in data.vuruslar) { let yuzde = (data.vuruslar[takim] / globalMaxBatarya) * 100; vurusBar.innerHTML += `<div class="${bgRenkleriClasses[takim]} h-full" style="width: ${yuzde}%"></div>`; } }
+                    if(totalHits > 0) { for(let takim in data.vuruslar) { let yuzde = (data.vuruslar[takim] / globalMaxSoru) * 100; vurusBar.innerHTML += `<div class="${bgRenkleriClasses[takim]} h-full" style="width: ${yuzde}%"></div>`; } }
                 }
             }
         });
 
-        // Soru İşlemleri
         function soruyuGetir() {
             const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value;
             db.ref(`sorular/bolge_${b}/soru_${s}`).once('value').then((snap) => {
@@ -315,7 +315,7 @@
                 for(let b=1; b<=7; b++){
                     if(data[`bolge_${b}`]){
                         html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
-                        for(let s=1; s<=globalMaxBatarya; s++){
+                        for(let s=1; s<=globalMaxSoru; s++){
                              let soru = data[`bolge_${b}`][`soru_${s}`];
                              if(soru) {
                                  html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'><p style='margin-top:0; font-size:14px;'><b>Batarya ${s}:</b> ${soru.soru_metni}</p><ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'><li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li><li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
