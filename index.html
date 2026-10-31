@@ -43,10 +43,16 @@
         <button onclick="sistemeBaglan()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded text-lg">GİRİŞ YAP</button>
     </div>
 
+    <!-- YENİ LOBİLİ KİLİT EKRANI -->
     <div id="kilit-ekrani" class="hidden w-full max-w-md bg-slate-800 p-8 rounded border border-slate-600 shadow flex-col items-center justify-center text-center mt-10">
         <svg class="w-16 h-16 text-yellow-500 mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         <h2 class="text-xl font-bold text-yellow-400 mb-2 neon-text">SİSTEM KİLİTLİ</h2>
-        <p class="text-sm text-slate-400">Komuta merkezinden Savaş İzni bekleniyor...</p>
+        <p class="text-sm text-slate-400 mb-6">Komuta merkezinden Savaş İzni bekleniyor...</p>
+        
+        <div class="w-full bg-slate-900 p-4 rounded border border-slate-700">
+            <h3 class="text-xs text-cyan-400 font-bold mb-3" id="lobi-text">0 / X Komutan Bağlandı</h3>
+            <div id="lobi-container" class="flex flex-col gap-2 w-full"></div>
+        </div>
     </div>
 
     <div id="main-screen" class="hidden w-full max-w-md flex-col gap-2 pb-4 relative">
@@ -71,7 +77,7 @@
                 <div onclick="hedefSec(3)" id="btn-bolge-3" class="map-zone map-b3"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">İÇ SAĞ (B3)</div><div class="text-[10px] font-bold text-white hp-gosterge text-shadow-hard">0 VURUŞ</div></div>
                 <div onclick="hedefSec(4)" id="btn-bolge-4" class="map-zone map-b4"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">DIŞ SAĞ (B4)</div><div class="text-[10px] font-bold text-white hp-gosterge text-shadow-hard">0 VURUŞ</div></div>
             </div>
-            <div class="text-[10px] text-center text-slate-400 mt-1">Girdiğiniz bir bölgedeki 6 mühimmatı art arda çözebilirsiniz!</div>
+            <div class="text-[10px] text-center text-slate-400 mt-1">Bölgelerdeki tüm mühimmatları art arda bitirip fethedebilirsiniz!</div>
         </div>
 
         <div id="gorev-alani" class="hidden bg-slate-800 p-3 rounded border border-slate-600 shadow flex-col gap-2">
@@ -95,7 +101,7 @@
         <div class="flex gap-8 mb-8">
             <div class="flex flex-col items-center"><span class="text-4xl font-bold text-green-400" id="karne-dogru">0</span><span class="text-xs text-slate-400 mt-1">İSABET</span></div><div class="flex flex-col items-center"><span class="text-4xl font-bold text-red-400" id="karne-yanlis">0</span><span class="text-xs text-slate-400 mt-1">KARAVANA</span></div>
         </div>
-        <button onclick="pdfIndir()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded">SAVAŞ ARŞİVİNİ (PDF) İNDİR</button>
+        <button onclick="pdfIndir()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded">SAVAŞ ARŞİVİNİ İNDİR</button>
     </div>
 
     <div id="pdf-container" style="display:none; background:white; color:black; padding:20px; font-family:sans-serif;"></div>
@@ -107,13 +113,19 @@
         const firebaseConfig = { apiKey: "AIzaSyBNNjeKMq9MkYcWn8wXK_Zye6M5qHG_G4k", authDomain: "yafl-tesis-34.firebaseapp.com", databaseURL: "https://yafl-tesis-34-default-rtdb.europe-west1.firebasedatabase.app", projectId: "yafl-tesis-34", storageBucket: "yafl-tesis-34.firebasestorage.app", messagingSenderId: "561962762810", appId: "1:561962762810:web:6aa5bcdbb2c08b6b232b03" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
 
+        let globalMaxBatarya = 6;
         let aktifTakim = ""; let aktifTerminal = ""; let ogrenciIsmi = ""; 
-        let seciliBolge = null; let aktifAtisSoruNo = 1; // YENİ: Öğrencinin o bölgedeki sıradaki sorusu
+        let seciliBolge = null; let aktifAtisSoruNo = 1; 
         let dogruCevap = ""; let isSavasBasladi = false; let isSavasBitti = false;
         let cozulmusSorular = {}; let skorDogru = 0; let skorYanlis = 0; let elendiMi = false;
         let isGirisYapildi = false; let benimSessionToken = Math.random().toString(36).substr(2);
         let bolgeCanlari = {1:6, 2:6, 3:6, 4:6, 5:6, 6:6, 7:6}; let lockInterval = null;
-        const takimRenkleri = { takim_1: 'bg-blue-500', takim_2: 'bg-green-500', takim_3: 'bg-purple-500', takim_4: 'bg-orange-500' };
+        
+        const bgRenkleriHex = { takim_1: '#3b82f6', takim_2: '#22c55e', takim_3: '#a855f7', takim_4: '#f97316' };
+        const bgRenkleriClasses = { takim_1: 'bg-blue-500', takim_2: 'bg-green-500', takim_3: 'bg-purple-500', takim_4: 'bg-orange-500' };
+        const takimIsimleri = ["ALFA", "BETA", "GAMA", "DELTA"];
+
+        db.ref('harita_durumu/genel/max_batarya').on('value', snap => { if(snap.exists()) globalMaxBatarya = snap.val(); });
 
         function sistemeBaglan() {
             const girilenSifre = document.getElementById('ogrenci-sifre').value.trim();
@@ -121,12 +133,15 @@
             db.ref('oyun_durumu/takimlar').once('value').then(snap => {
                 const takimlar = snap.val(); let bulundu = false;
                 if(takimlar) {
-                    for(let t=1; t<=4; t++) { for(let term=1; term<=6; term++) {
+                    for(let t=1; t<=4; t++) { for(let term=1; term<=30; term++) {
                         const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
                         if(ogr && ogr.sifre === girilenSifre) {
                             bulundu = true; aktifTakim = t; aktifTerminal = term; isGirisYapildi = true; ogrenciIsmi = ogr.isim;
                             skorDogru = ogr.dogru || 0; skorYanlis = ogr.yanlis || 0; cozulmusSorular = ogr.cozulen_bolgeler || {}; elendiMi = ogr.elendi || false;
-                            const userRef = db.ref(`oyun_durumu/takimlar/takim_${t}/terminal_${term}`); userRef.update({ durum: "aktif", session_token: benimSessionToken });
+                            
+                            const userRef = db.ref(`oyun_durumu/takimlar/takim_${t}/terminal_${term}`); 
+                            userRef.update({ durum: "aktif", session_token: benimSessionToken });
+                            
                             document.getElementById('kullanici-bilgi').innerText = `T-${t} / B-${term} : ${ogrenciIsmi.toUpperCase()}`;
                             document.getElementById('karne-isim').innerText = ogrenciIsmi.toUpperCase(); document.getElementById('login-screen').classList.add('hidden');
                             
@@ -144,6 +159,26 @@
             });
         }
 
+        // LOBİ ÇİZİMİ (ÖĞRENCİ KİLİT EKRANI İÇİN)
+        db.ref('oyun_durumu/takimlar').on('value', snap => {
+            const takimlar = snap.val() || {}; let lobiHtml = ""; let aktifSayisi = 0; let toplamKapasite = 4 * globalMaxBatarya;
+            for(let t=1; t<=4; t++) {
+                lobiHtml += `<div class="flex items-center gap-2 justify-center"><span class="text-[9px] text-slate-400 w-10 text-right">${takimIsimleri[t-1]}</span><div class="flex gap-1 flex-wrap justify-start">`;
+                for(let term=1; term<=globalMaxBatarya; term++) {
+                    const ogr = takimlar[`takim_${t}`]?.[`terminal_${term}`];
+                    let bgRenk = "bg-slate-800"; let elendiKip = "";
+                    if(ogr) {
+                        if(ogr.durum === "aktif") { bgRenk = bgRenkleriClasses[`takim_${t}`]; aktifSayisi++; }
+                        if(ogr.elendi) { bgRenk = "bg-red-600 opacity-50"; elendiKip = `<span class="text-[8px] font-bold text-white">X</span>`; }
+                    }
+                    lobiHtml += `<div class="w-4 h-4 rounded-sm ${bgRenk} border border-slate-600 flex items-center justify-center">${elendiKip}</div>`;
+                }
+                lobiHtml += `</div></div>`;
+            }
+            document.getElementById('lobi-container').innerHTML = lobiHtml;
+            document.getElementById('lobi-text').innerText = `${aktifSayisi} / ${toplamKapasite} Savaşçı Bağlandı`;
+        });
+
         function ekranGuncelle() {
             if(!isGirisYapildi) return; 
             const kilitEkrani = document.getElementById('kilit-ekrani'); const mainScreen = document.getElementById('main-screen'); const karneEkrani = document.getElementById('karne-ekrani'); const elendiEkrani = document.getElementById('elendi-ekrani');
@@ -155,30 +190,34 @@
 
         db.ref('harita_durumu/genel').on('value', snap => { const veri = snap.val() || {}; isSavasBasladi = veri.savas_basladi || false; isSavasBitti = veri.savas_bitti || false; ekranGuncelle(); });
 
-        // YENİ HARİTA BOYA MOTORU VE KİLİT KONTROLÜ
+        // FETİH RENKLENDİRME VE KALKAN
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`btn-bolge-${i}`); if(!btn) continue;
                 const hpGosterge = btn.querySelector('.hp-gosterge');
-                const data = bolgeler[`bolge_${i}`] || { hp: 6, vuruslar: {} };
+                const data = bolgeler[`bolge_${i}`] || { hp: globalMaxBatarya, vuruslar: {} };
                 
-                bolgeCanlari[i] = data.hp; // Kalkanları hesaplamak için can durumunu kaydet
+                let currentHp = data.hp !== undefined ? data.hp : globalMaxBatarya;
+                bolgeCanlari[i] = currentHp; 
                 
                 let t1 = data.vuruslar?.takim_1 || 0; let t2 = data.vuruslar?.takim_2 || 0;
                 let t3 = data.vuruslar?.takim_3 || 0; let t4 = data.vuruslar?.takim_4 || 0;
                 let totalHits = t1 + t2 + t3 + t4;
                 
-                hpGosterge.innerText = `${totalHits} VURUŞ`;
-                
-                if(totalHits > 0) {
-                    let p1 = (t1 / totalHits) * 100; let p2 = p1 + (t2 / totalHits) * 100; let p3 = p2 + (t3 / totalHits) * 100;
-                    btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
+                if(currentHp <= 0) {
+                    let max = 0; let winner = "";
+                    if(t1 > max) { max = t1; winner = 'takim_1'; } if(t2 > max) { max = t2; winner = 'takim_2'; }
+                    if(t3 > max) { max = t3; winner = 'takim_3'; } if(t4 > max) { max = t4; winner = 'takim_4'; }
+                    btn.style.background = bgRenkleriHex[winner] || '#475569'; btn.classList.add('zone-conquered'); hpGosterge.innerText = `FETHEDİLDİ`;
                 } else {
-                    btn.style.background = '#1e293b';
+                    hpGosterge.innerText = `${totalHits} / ${globalMaxBatarya} VURUŞ`;
+                    if(totalHits > 0) {
+                        let p1 = (t1 / totalHits) * 100; let p2 = p1 + (t2 / totalHits) * 100; let p3 = p2 + (t3 / totalHits) * 100;
+                        btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
+                    } else { btn.style.background = '#1e293b'; }
+                    btn.classList.remove('zone-conquered');
                 }
-                
-                if(data.hp <= 0) btn.classList.add('zone-conquered'); else btn.classList.remove('zone-conquered');
             }
             
             const b56Kilitli = (bolgeCanlari[1] > 0 || bolgeCanlari[2] > 0 || bolgeCanlari[3] > 0 || bolgeCanlari[4] > 0);
@@ -192,27 +231,21 @@
             
             if(seciliBolge) document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili');
             
-            // YENİ: BÖLGEDEKİ SIRADAKİ ÇÖZÜLMEMİŞ SORUYU BULMA MOTORU
-            let cozulmusler = cozulmusSorular[`bolge_${bolgeNo}`];
-            if(cozulmusler === true) cozulmusler = { soru_1: true }; // Eski sistemden kalanlar için güvenlik önlemi
-            cozulmusler = cozulmusler || {};
+            // YENİ: Öğrencinin o bölgede henüz çözmediği ilk soruyu bul
+            let cozulmusler = cozulmusSorular[`bolge_${bolgeNo}`] || {};
+            if(cozulmusler === true) cozulmusler = { soru_1: true }; // Eski kalıntılar için
 
             let siradakiSoru = 0;
-            for(let i=1; i<=6; i++) {
+            for(let i=1; i<=globalMaxBatarya; i++) {
                 if(!cozulmusler[`soru_${i}`]) { siradakiSoru = i; break; }
             }
+            
+            if(siradakiSoru === 0) { alert("MÜKEMMEL! Bu bölgedeki tüm mühimmatları başarıyla tükettiniz. Lütfen başka bir bölgeye destek verin."); return; }
 
-            if(siradakiSoru === 0) {
-                alert("MÜKEMMEL! Bu bölgedeki tüm bataryaları (6 Soru) başarıyla tamamladınız. Lütfen başka bir bölgeye geçin.");
-                return;
-            }
-
-            aktifAtisSoruNo = siradakiSoru;
-            seciliBolge = bolgeNo;
+            aktifAtisSoruNo = siradakiSoru; seciliBolge = bolgeNo;
             
             document.getElementById(`btn-bolge-${bolgeNo}`).classList.add('hedef-secili'); 
-            document.getElementById('secili-bolge-no').innerText = bolgeNo; 
-            document.getElementById('aktif-soru-no').innerText = aktifAtisSoruNo; // Öğrenciye kaçıncı soruyu çözdüğünü gösterir
+            document.getElementById('secili-bolge-no').innerText = bolgeNo; document.getElementById('aktif-soru-no').innerText = aktifAtisSoruNo;
             document.getElementById('gorev-alani').classList.remove('hidden'); document.getElementById('gorev-alani').classList.add('flex'); document.getElementById('soru-kutusu').innerHTML = `<p class="text-slate-400 animate-pulse">Soru çekiliyor...</p>`;
             
             db.ref(`sorular/bolge_${bolgeNo}/soru_${aktifAtisSoruNo}`).once('value').then((snapshot) => {
@@ -220,13 +253,10 @@
                     const veri = snapshot.val(); dogruCevap = veri.dogru_cevap; document.getElementById('soru-kutusu').innerHTML = veri.soru_metni.replace(/\n/g, '<br>');
                     document.getElementById('sık-A').innerHTML = veri.secenekler.A; document.getElementById('sık-B').innerHTML = veri.secenekler.B; document.getElementById('sık-C').innerHTML = veri.secenekler.C; document.getElementById('sık-D').innerHTML = veri.secenekler.D; document.getElementById('sık-E').innerHTML = veri.secenekler.E;
                     try { renderMathInElement(document.getElementById('gorev-alani'), { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] }); } catch(e) {}
-                } else {
-                    document.getElementById('soru-kutusu').innerHTML = "<p class='text-red-400'>Komuta merkezi bu mühimmatı henüz yüklemedi.</p>"; dogruCevap = "";
-                }
+                } else { document.getElementById('soru-kutusu').innerHTML = "<p class='text-red-400'>Komuta merkezi bu mühimmatı henüz yüklemedi.</p>"; dogruCevap = ""; }
             });
         }
 
-        // YENİ FÜZE ATEŞLEME (Her doğru atışta bölgeye kalıcı iz bırakır)
         function atesle(secilenSik) {
             if(dogruCevap === "") return; const userRef = db.ref(`oyun_durumu/takimlar/takim_${aktifTakim}/terminal_${aktifTerminal}`);
             if(secilenSik === dogruCevap) {
@@ -234,17 +264,23 @@
                 
                 if(cozulmusSorular[`bolge_${seciliBolge}`] === true) cozulmusSorular[`bolge_${seciliBolge}`] = {}; 
                 if(!cozulmusSorular[`bolge_${seciliBolge}`]) cozulmusSorular[`bolge_${seciliBolge}`] = {};
-                
-                cozulmusSorular[`bolge_${seciliBolge}`][`soru_${aktifAtisSoruNo}`] = true; // O soruyu kalıcı olarak çözülmüş işaretle
+                cozulmusSorular[`bolge_${seciliBolge}`][`soru_${aktifAtisSoruNo}`] = true; 
                 
                 skorDogru++; userRef.update({ dogru: skorDogru, cozulen_bolgeler: cozulmusSorular });
                 
+                // Mermilerin Güvenli Düşüşü (Transaction)
                 const bolgeRef = db.ref(`harita_durumu/bolgeler/bolge_${seciliBolge}`);
-                bolgeRef.once('value').then(snap => {
-                    let data = snap.val() || { hp: 6, vuruslar: {} };
-                    data.hp -= 1; // Canı düşür (Eksiye düşmesi kilitleri açık tutar)
-                    let takimKey = `takim_${aktifTakim}`; data.vuruslar[takimKey] = (data.vuruslar[takimKey] || 0) + 1; bolgeRef.set(data);
+                bolgeRef.transaction((data) => {
+                    if (data === null) data = { hp: globalMaxBatarya, vuruslar: {} };
+                    if (data.hp === undefined) data.hp = globalMaxBatarya;
+                    if (data.hp > 0) {
+                        data.hp -= 1; let takimKey = `takim_${aktifTakim}`;
+                        if (!data.vuruslar) data.vuruslar = {};
+                        data.vuruslar[takimKey] = (data.vuruslar[takimKey] || 0) + 1;
+                    }
+                    return data;
                 });
+                
                 document.getElementById('gorev-alani').classList.add('hidden'); document.getElementById(`btn-bolge-${seciliBolge}`).classList.remove('hedef-secili'); seciliBolge = null;
             } else {
                 skorYanlis++; let Updates = { yanlis: skorYanlis };
@@ -275,24 +311,15 @@
 
         function pdfIndir() {
             db.ref('sorular').once('value').then(snap => {
-                const data = snap.val(); if(!data) { alert("Soru bulunamadı!"); return; }
-                let html = "<div style='padding:20px; font-family:Arial, sans-serif;'>";
-                html += "<h2 style='text-align:center; color:#333; margin-bottom:15px; border-bottom:2px solid #ccc; padding-bottom:10px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
-                
+                const data = snap.val(); if(!data) return;
+                let html = "<div style='padding:20px; font-family:Arial, sans-serif;'><h2 style='text-align:center; color:#333; margin-bottom:15px; border-bottom:2px solid #ccc; padding-bottom:10px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
                 for(let b=1; b<=7; b++){
                     if(data[`bolge_${b}`]){
-                        html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3>`;
-                        html += `<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
-                        for(let s=1; s<=6; s++){
+                        html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
+                        for(let s=1; s<=globalMaxBatarya; s++){
                              let soru = data[`bolge_${b}`][`soru_${s}`];
                              if(soru) {
-                                 html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'>`;
-                                 html += `<p style='margin-top:0; font-size:14px;'><b>Batarya ${s}:</b> ${soru.soru_metni}</p>`;
-                                 html += `<ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'>
-                                    <li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li>
-                                    <li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li>
-                                    <li><b>E)</b> ${soru.secenekler.E}</li></ul>`;
-                                 html += `<p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
+                                 html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'><p style='margin-top:0; font-size:14px;'><b>Batarya ${s}:</b> ${soru.soru_metni}</p><ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'><li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li><li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
                              }
                         }
                         html += `</div>`;
@@ -301,7 +328,6 @@
                 html += "</div>";
                 const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; 
                 renderMathInElement(container, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
-                
                 const opt = { margin: [0.4, 0.4, 0.4, 0.4], filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
                 alert("Sorular 2 sütunlu pdf olarak hazırlanıyor... Lütfen bekleyin.");
                 html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
