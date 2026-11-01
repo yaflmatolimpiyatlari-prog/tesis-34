@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- YENİ: Resim Kırpma Motoru -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
@@ -23,15 +24,19 @@
         .map-b2 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 26%; width: 22%; height: 25%; padding-top:15%; }
         .map-b3 { clip-path: polygon(0% 0%, 100% 20%, 80% 100%, 0% 100%); top: 72%; left: 52%; width: 22%; height: 25%; padding-top:15%; }
         .map-b4 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 76%; width: 22%; height: 25%; padding-top:15%; }
+        .zone-conquered { border: 3px solid #ffffff !important; box-shadow: 0 0 20px rgba(255,255,255,0.8); z-index: 10; }
         .text-shadow-hard { text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9); }
     </style>
 </head>
 <body class="p-4 min-h-screen flex flex-col relative">
 
+    <!-- KIRPMA MODALI -->
     <div id="crop-modal" class="hidden fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center p-4">
         <h2 class="text-white font-bold mb-2">Resmi Soruyu Kırpın</h2>
         <div class="w-full max-w-2xl bg-slate-800 rounded p-2 flex flex-col gap-4 h-[70vh]">
-            <div class="flex-grow overflow-hidden relative bg-slate-900 rounded"><img id="crop-image" class="block max-w-full"></div>
+            <div class="flex-grow overflow-hidden relative bg-slate-900 rounded">
+                <img id="crop-image" class="block max-w-full">
+            </div>
             <div class="flex gap-2">
                 <button onclick="cropCancel()" class="flex-1 bg-red-700 hover:bg-red-600 p-3 rounded text-white font-bold text-sm">İptal</button>
                 <button onclick="cropSave()" class="flex-1 bg-green-600 hover:bg-green-500 p-3 rounded text-white font-bold text-sm">Kırp ve Kullan</button>
@@ -42,7 +47,7 @@
     <header class="flex justify-between items-center mb-4 border-b border-slate-700 pb-4">
         <div>
             <h1 class="text-3xl text-cyan-400 font-bold neon-text tracking-widest">SAVAŞ KOMUTA MERKEZİ</h1>
-            <p class="text-xs text-slate-400 mt-1">Görsel Zeka, Çift Mod ve Otomatik Cevap Okuyucu</p>
+            <p class="text-xs text-slate-400 mt-1">Çift Mod, Kırpma Aracı ve Toplu Dağıtım Sistemi</p>
         </div>
         <div class="text-right flex gap-3 items-center">
             <button onclick="takimlariKur()" id="btn-takim-kur" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-4 rounded">1. ONAYLA (LOBİ)</button>
@@ -65,11 +70,13 @@
                 </div>
             </div>
 
+            <!-- YENİ: ÇİFT MOD VE KAPASİTE AYARI -->
             <div class="flex flex-col gap-2 bg-slate-900 p-3 rounded border border-slate-600">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-xs text-slate-300 font-bold">Oyun Modu:</span>
                     <select id="ayar_oyun_modu" class="bg-slate-800 border border-slate-500 rounded text-center text-white text-xs outline-none p-1 w-32">
-                        <option value="takim">Takım Savaşı</option><option value="bireysel">Bireysel (Tekil) Mod</option>
+                        <option value="takim">Takım Savaşı</option>
+                        <option value="bireysel">Bireysel (Tekil) Mod</option>
                     </select>
                 </div>
                 <div class="flex justify-between items-center">
@@ -79,16 +86,17 @@
                 <button onclick="kapasiteVeModAyarla()" class="bg-cyan-700 hover:bg-cyan-600 text-white text-[10px] font-bold px-2 py-2 rounded mt-1">MODU & KAPASİTEYİ UYGULA (Sistemi Sıfırlar)</button>
             </div>
 
-            <!-- TOPLU RESİM YÜKLEME -->
+            <!-- YENİ: TOPLU RESİM YÜKLEME -->
             <div class="bg-purple-900/30 p-3 rounded border border-purple-700 shadow-lg flex flex-col gap-2">
-                <h3 class="text-[11px] text-purple-400 font-bold mb-0.5">📂 ÇOKLU RESİM (ARŞİV) DAĞITIMI</h3>
-                <p class="text-[9px] text-purple-300 mb-2">Dosya isminin sonuna <strong class="text-white">_A, -B</strong> eklerseniz (Örn: <span class="italic text-yellow-200">soru1_C.jpg</span>) cevap otomatik kodlanır. Yoksa varsayılan seçilir.</p>
+                <h3 class="text-[11px] text-purple-400 font-bold mb-1">📂 ÇOKLU RESİM (ARŞİV) DAĞITIMI</h3>
                 <div class="flex gap-2 text-xs">
                     <select id="bulk_hedef" class="bg-slate-900 border border-purple-600 p-1.5 rounded text-white outline-none flex-grow">
-                        <option value="1-4">Bölge 1, 2, 3, 4 (Dış Hatlar)</option><option value="5-6">Bölge 5, 6 (Koridorlar)</option><option value="7-7">Bölge 7 (Ana Reaktör)</option>
+                        <option value="1-4">Bölge 1, 2, 3, 4 (Dış Hatlar'a Dağıt)</option>
+                        <option value="5-6">Bölge 5, 6 (Koridorlara Dağıt)</option>
+                        <option value="7-7">Bölge 7 (Sadece Ana Reaktöre Dağıt)</option>
                     </select>
                     <select id="bulk_cevap" class="bg-slate-900 border border-purple-600 p-1.5 rounded text-white outline-none">
-                        <option value="A">Varsayılan: A</option><option value="B">Varsayılan: B</option><option value="C">Varsayılan: C</option><option value="D">Varsayılan: D</option><option value="E">Varsayılan: E</option>
+                        <option value="A">Hepsinin Cevabı: A</option><option value="B">Cevap: B</option><option value="C">Cevap: C</option><option value="D">Cevap: D</option><option value="E">Cevap: E</option>
                     </select>
                 </div>
                 <input type="file" id="bulk_input" multiple accept="image/*" class="text-[10px] text-slate-400 bg-slate-900 p-1 rounded border border-slate-700">
@@ -96,7 +104,7 @@
                 <div id="bulk_status" class="text-[10px] text-center text-purple-300 hidden">Yükleniyor, lütfen bekleyin...</div>
             </div>
 
-            <!-- TEKİL MÜHİMMAT YÜKLEME -->
+            <!-- MÜHİMMAT YÜKLEME -->
             <div class="bg-slate-800 p-4 rounded border border-slate-600 shadow-lg flex-grow flex flex-col">
                 <h2 class="text-sm mb-2 text-yellow-400 font-bold flex justify-between items-center border-b border-slate-700 pb-2">
                     <span>🚀 Tekil Mühimmat Düzenle</span>
@@ -112,6 +120,7 @@
                 
                 <div class="mb-2"><textarea id="soru_metni" rows="1" placeholder="Soru metni (İsteğe Bağlı)..." class="w-full bg-slate-900 border border-slate-600 p-2 rounded outline-none focus:border-cyan-400 text-xs" oninput="updatePreview()"></textarea></div>
                 
+                <!-- KESME (CROP) DESTEKLİ RESİM INPUT -->
                 <div class="mb-2 bg-slate-900 border border-slate-600 p-2 rounded flex items-center justify-between">
                     <label class="text-[10px] text-slate-300 font-bold">Resim (Çek/Seç):</label>
                     <input type="file" id="resim_input" accept="image/*" class="text-[10px] text-slate-400 w-2/3" onchange="resimSecildi(event)">
@@ -226,7 +235,7 @@
         function cropSave() {
             if(!cropper) return;
             const canvas = cropper.getCroppedCanvas({ maxWidth: 1000, maxHeight: 1000 });
-            const b64 = canvas.toDataURL('image/jpeg', 0.85);
+            const b64 = canvas.toDataURL('image/jpeg', 0.85); // %85 kalite
             document.getElementById('resim_base64').value = b64;
             updatePreview(); cropCancel();
         }
@@ -248,13 +257,9 @@
                     if(fileIndex >= files.length) break;
                     
                     const file = files[fileIndex];
-                    const b64 = await compressFile(file);
+                    const b64 = await compressFile(file); // Resmi hafifletir
                     
-                    let answer = defCevap;
-                    const match = file.name.match(/[-_]([A-Ea-e])\.[^.]+$/);
-                    if(match) { answer = match[1].toUpperCase(); }
-                    
-                    const veri = { soru_metni: "", resim: b64, secenekler: { A:"", B:"", C:"", D:"", E:"" }, dogru_cevap: answer };
+                    const veri = { soru_metni: "", resim: b64, secenekler: { A:"", B:"", C:"", D:"", E:"" }, dogru_cevap: defCevap };
                     await db.ref(`sorular/bolge_${b}/soru_${s}`).set(veri);
                     successCount++; fileIndex++;
                 }
@@ -325,7 +330,7 @@
         
         function sistemiSifirla() { if(confirm("DİKKAT: Öğrenciler dahil TÜM SİSTEM sıfırlanacak. Emin misiniz?")) { sistemiSifirlaIslemi(); } }
         function sistemiSifirlaIslemi() {
-            db.ref('lobi').remove(); let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { dogrular_toplam: 0, dogrular: {1:0, 2:0, 3:0, 4:0} }; }
+            db.ref('lobi').remove(); let bolgeler = {}; for(let i=1; i<=7; i++) { bolgeler[`bolge_${i}`] = { dogrular_toplam: 0 }; }
             db.ref('harita_durumu/bolgeler').set(bolgeler); db.ref('harita_durumu/genel').update({ savas_basladi: false, savas_bitti: false });
         }
         
@@ -335,36 +340,23 @@
             }
         }
 
-        // HARİTA ÇİZİMİ (ÖĞRETMEN: Takım modunda takımları, bireyselde turkuazı gösterir)
+        // HARİTA ÇİZİMİ (ÖĞRETMEN: Toplam Doğrulara Göre)
         db.ref('harita_durumu/bolgeler').on('value', snapshot => {
             const bolgeler = snapshot.val() || {};
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`radar-bolge-${i}`); if(!btn) continue;
                 const isimDiv = btn.querySelector('.bolge-isim');
-                const data = bolgeler[`bolge_${i}`] || { dogrular: {}, dogrular_toplam: 0 };
+                const data = bolgeler[`bolge_${i}`] || { dogrular_toplam: 0 };
                 
                 let totalHits = data.dogrular_toplam || 0;
                 isimDiv.innerText = `${totalHits} DOĞRU`;
                 
-                if(totalHits > 0) { 
-                    if(globalOyunModu === "bireysel") {
-                        btn.style.background = `linear-gradient(to right, #0891b2 0%, #0284c7 100%)`; 
-                    } else {
-                        let t1 = data.dogrular?.[1] || 0; let t2 = data.dogrular?.[2] || 0;
-                        let t3 = data.dogrular?.[3] || 0; let t4 = data.dogrular?.[4] || 0;
-                        let sum = t1 + t2 + t3 + t4;
-                        if(sum > 0) {
-                            let p1 = (t1 / sum) * 100; let p2 = p1 + (t2 / sum) * 100; let p3 = p2 + (t3 / sum) * 100;
-                            btn.style.background = `linear-gradient(to right, #3b82f6 0% ${p1}%, #22c55e ${p1}% ${p2}%, #a855f7 ${p2}% ${p3}%, #f97316 ${p3}% 100%)`;
-                        } else {
-                            btn.style.background = '#1e293b';
-                        }
-                    }
-                } 
+                if(totalHits > 0) { btn.style.background = `linear-gradient(to right, #0891b2 0%, #0284c7 100%)`; } 
                 else { btn.style.background = '#1e293b'; } 
             }
         });
 
+        // Soru İşlemleri
         function soruyuGetir() {
             const b = document.getElementById('bolge').value; const s = document.getElementById('soru_no').value;
             db.ref(`sorular/bolge_${b}/soru_${s}`).once('value').then((snap) => {
@@ -406,8 +398,7 @@
                     }
                 }
                 html += "</div>";
-                const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; 
-                renderMathInElement(container, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
+                const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; renderMathInElement(container, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
                 const opt = { margin: [0.4, 0.4, 0.4, 0.4], filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
                 html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
             });
