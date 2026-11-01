@@ -8,14 +8,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; overflow-x: hidden; }
         .neon-text { text-shadow: 0 0 5px currentColor; }
         .secenek-btn { transition: all 0.2s ease; }
         .secenek-btn:hover { background-color: #1e293b; border-color: #38bdf8; }
         .fire-flash { animation: flash-red 0.5s ease-out; }
+        
         @keyframes flash-red { 0% { background-color: #ef4444; } 100% { background-color: #0f172a; } }
+        @keyframes pulse-aktif { 0% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } 50% { border-color: #fca5a5; box-shadow: 0 0 25px rgba(239, 68, 68, 1); } 100% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } }
         
         .map-container { position: relative; width: 100%; aspect-ratio: 4/5; background: #020617; border-radius: 10px; overflow: hidden; border: 1px solid #334155; }
         .map-zone { position: absolute; background: #1e293b; border: 2px solid #475569; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.5s ease; cursor: pointer; }
@@ -28,9 +29,10 @@
         .map-b3 { clip-path: polygon(0% 0%, 100% 20%, 80% 100%, 0% 100%); top: 72%; left: 52%; width: 22%; height: 25%; padding-top:10%; }
         .map-b4 { clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 20% 100%); top: 72%; left: 76%; width: 22%; height: 25%; padding-top:10%; }
         
-        .hedef-secili { border: 2px solid #ef4444 !important; filter: drop-shadow(0 0 10px #ef4444); z-index: 10;}
-        .zone-conquered { opacity: 0.6; pointer-events: none; border-color:#cbd5e1 !important; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .aktif-cephe { border: 3px solid #ef4444 !important; animation: pulse-aktif 1.5s infinite !important; z-index: 20; }
+        .hedef-secili { z-index: 25; }
+        .zone-conquered { pointer-events: none; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .text-shadow-hard { text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9); }
     </style>
 </head>
@@ -72,12 +74,11 @@
                 <div onclick="hedefSec(3)" id="btn-bolge-3" class="map-zone map-b3"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">İÇ SAĞ (B3)</div><div class="text-[10px] font-bold text-white bolge-isim text-shadow-hard">KİLİTLİ</div></div>
                 <div onclick="hedefSec(4)" id="btn-bolge-4" class="map-zone map-b4"><div class="text-[7px] font-bold text-slate-300 mb-0.5 text-shadow-hard">DIŞ SAĞ (B4)</div><div class="text-[10px] font-bold text-white bolge-isim text-shadow-hard">KİLİTLİ</div></div>
             </div>
-            <div class="text-[10px] text-center text-slate-400 mt-1">Sadece AKTİF CEPHE'ye saldırabilirsiniz. Bitirince diğeri açılır!</div>
+            <div class="text-[10px] text-center text-slate-400 mt-1">Sadece yanıp sönen AKTİF CEPHE'ye saldırabilirsiniz!</div>
         </div>
 
         <div id="gorev-alani" class="hidden bg-slate-800 p-3 rounded border border-slate-600 shadow flex-col gap-2">
             <div class="bg-red-900/30 border border-red-700 p-2 rounded text-center"><span class="text-red-400 font-bold text-sm">AKTİF CEPHE: BÖLGE <span id="secili-bolge-no">X</span> (Görev <span id="aktif-soru-no">Y</span>)</span></div>
-            <!-- YENİ RESİMLİ SORU KUTUSU -->
             <div id="soru-kutusu" class="bg-slate-900 p-3 rounded border border-slate-700 text-center min-h-[100px] flex flex-col justify-center items-center text-sm"></div>
             <div id="secenekler-kutusu" class="flex flex-col gap-1.5">
                 <button onclick="atesle('A')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">A)</span> <span id="sık-A" class="flex-grow"></span></button><button onclick="atesle('B')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">B)</span> <span id="sık-B" class="flex-grow"></span></button><button onclick="atesle('C')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">C)</span> <span id="sık-C" class="flex-grow"></span></button><button onclick="atesle('D')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">D)</span> <span id="sık-D" class="flex-grow"></span></button><button onclick="atesle('E')" class="secenek-btn bg-slate-900 border border-slate-700 rounded p-2 text-left text-sm flex"><span class="font-bold text-cyan-400 w-6">E)</span> <span id="sık-E" class="flex-grow"></span></button>
@@ -91,10 +92,7 @@
         <div class="flex gap-8 mb-8">
             <div class="flex flex-col items-center"><span class="text-4xl font-bold text-green-400" id="karne-dogru">0</span><span class="text-xs text-slate-400 mt-1">İSABET</span></div><div class="flex flex-col items-center"><span class="text-4xl font-bold text-red-400" id="karne-yanlis">0</span><span class="text-xs text-slate-400 mt-1">KARAVANA</span></div>
         </div>
-        <button onclick="pdfIndir()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded">SAVAŞ ARŞİVİNİ İNDİR</button>
     </div>
-
-    <div id="pdf-container" style="display:none; background:white; color:black; padding:20px; font-family:sans-serif;"></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -106,13 +104,16 @@
         let myUid = localStorage.getItem("tesis_uid");
         if(!myUid) { myUid = "usr_" + Math.random().toString(36).substr(2, 9); localStorage.setItem("tesis_uid", myUid); }
 
+        const neonColors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b', '#f97316', '#ef4444'];
+        let myCustomColor = localStorage.getItem("tesis_mycolor");
+        if(!myCustomColor) { myCustomColor = neonColors[Math.floor(Math.random() * neonColors.length)]; localStorage.setItem("tesis_mycolor", myCustomColor); }
+
         let ogrenciIsmi = ""; let benimTakim = 0; let globalOyunModu = "takim";
         let benimAktifBolgem = 1; let seciliBolge = null; let aktifAtisSoruNo = 1; 
         let globalMaxSoru = 6; let dogruCevap = ""; let isSavasBasladi = false; let isSavasBitti = false;
         let cozulmusSorular = {}; let skorDogru = 0; let skorYanlis = 0;
         let kilitBitis = 0; let lockInterval = null;
         
-        const bgRenkleriHex = { 1: '#3b82f6', 2: '#22c55e', 3: '#a855f7', 4: '#f97316' };
         const takimIsimleri = ["ALFA", "BETA", "GAMA", "DELTA", "BİREYSEL"];
 
         db.ref('harita_durumu/genel').on('value', snap => { 
@@ -175,22 +176,36 @@
         db.ref('harita_durumu/bolgeler').on('value', snapshot => { geciciBolgelerData = snapshot.val() || {}; haritayiCiz(); });
 
         function haritayiCiz() {
+            let activeColor = myCustomColor; 
+            if(globalOyunModu !== "bireysel") {
+                if(benimTakim == 1) activeColor = '#3b82f6';
+                if(benimTakim == 2) activeColor = '#22c55e';
+                if(benimTakim == 3) activeColor = '#a855f7';
+                if(benimTakim == 4) activeColor = '#f97316';
+            }
+
             for(let i=1; i<=7; i++) {
                 const btn = document.getElementById(`radar-bolge-${i}`); if(!btn) continue;
                 const isimDiv = btn.querySelector('.bolge-isim');
                 
-                // Admin gibi Toplam Doğruya Göre Renk (Öğrenci Kendi Gelişimini Görür)
                 let c = Object.keys(cozulmusSorular[`bolge_${i}`] || {}).length;
+                let pct = Math.min(100, (c / globalMaxSoru) * 100);
+
+                // Tüm durum sınıflarını temizle
+                btn.classList.remove('zone-conquered', 'aktif-cephe');
 
                 if(i < benimAktifBolgem) {
                     isimDiv.innerText = `TAMAMLANDI`; btn.classList.add('zone-conquered');
-                    btn.style.background = `linear-gradient(to right, #0891b2 0%, #0284c7 100%)`; // Bitenler Camgöbeği/Mavi
+                    btn.style.background = 'none'; btn.style.backgroundColor = activeColor; 
+                    btn.style.border = "2px solid #cbd5e1"; btn.style.boxShadow = `0 0 15px ${activeColor}80`;
                 } else if(i === benimAktifBolgem && isSavasBasladi) {
-                    isimDiv.innerText = `AKTİF CEPHE`; btn.classList.remove('zone-conquered');
-                    btn.style.background = '#0f172a'; btn.style.border = "2px solid #ef4444"; btn.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.8)";
+                    isimDiv.innerText = `CEPHE (%${Math.round(pct)})`;
+                    btn.classList.add('aktif-cephe'); // YENİ EKLENEN ANİMASYON SINIFI
+                    btn.style.backgroundImage = `linear-gradient(to top, ${activeColor} ${pct}%, #0f172a ${pct}%)`;
                 } else {
-                    isimDiv.innerText = `KİLİTLİ`; btn.classList.remove('zone-conquered');
-                    btn.style.background = '#0f172a'; btn.style.border = "2px solid #334155"; btn.style.boxShadow = "none"; 
+                    isimDiv.innerText = `KİLİTLİ`; 
+                    btn.style.background = 'none'; btn.style.backgroundColor = '#0f172a'; 
+                    btn.style.border = "2px solid #334155"; btn.style.boxShadow = "none"; 
                 }
             }
         }
@@ -208,7 +223,13 @@
 
             aktifAtisSoruNo = siradakiSoru; seciliBolge = bolgeNo;
             
-            document.getElementById(`btn-bolge-${bolgeNo}`).classList.add('hedef-secili'); 
+            let activeColor = myCustomColor; 
+            if(globalOyunModu !== "bireysel") { if(benimTakim == 1) activeColor = '#3b82f6'; if(benimTakim == 2) activeColor = '#22c55e'; if(benimTakim == 3) activeColor = '#a855f7'; if(benimTakim == 4) activeColor = '#f97316'; }
+            
+            let btnBolge = document.getElementById(`btn-bolge-${bolgeNo}`);
+            btnBolge.classList.add('hedef-secili'); 
+            btnBolge.style.boxShadow = `0 0 25px ${activeColor}`;
+
             document.getElementById('secili-bolge-no').innerText = bolgeNo; document.getElementById('aktif-soru-no').innerText = aktifAtisSoruNo;
             document.getElementById('gorev-alani').classList.remove('hidden'); document.getElementById('gorev-alani').classList.add('flex'); document.getElementById('soru-kutusu').innerHTML = `<p class="text-slate-400 animate-pulse">Soru çekiliyor...</p>`;
             
@@ -235,8 +256,16 @@
                 document.body.classList.add('fire-flash'); setTimeout(() => document.body.classList.remove('fire-flash'), 500); 
                 skorDogru++; db.ref('lobi/' + myUid).update({ dogru: skorDogru, cozulenler: cozulmusSorular });
                 
-                const bolgeRef = db.ref(`harita_durumu/bolgeler/bolge_${seciliBolge}/dogrular_toplam`);
-                bolgeRef.transaction(toplam => (toplam || 0) + 1);
+                const bolgeRef = db.ref(`harita_durumu/bolgeler/bolge_${seciliBolge}`);
+                bolgeRef.transaction((data) => {
+                    if(!data) data = { dogrular: {}, dogrular_toplam: 0 };
+                    data.dogrular_toplam = (data.dogrular_toplam || 0) + 1;
+                    if(globalOyunModu !== "bireysel") {
+                        if(!data.dogrular) data.dogrular = {};
+                        data.dogrular[benimTakim] = (data.dogrular[benimTakim] || 0) + 1;
+                    }
+                    return data;
+                });
                 
                 let b = seciliBolge; seciliBolge = null; 
                 if(Object.keys(cozulmusSorular[`bolge_${b}`]).length >= globalMaxSoru) {
@@ -261,32 +290,6 @@
                     if(Object.keys(cozulmusSorular[`bolge_${sonBolge}`]).length >= globalMaxSoru) { alert("Bölge tamamlandı. Sıradaki kilit açıldı!"); } else { hedefSec(sonBolge); }
                 }
             }, 100);
-        }
-
-        function pdfIndir() {
-            db.ref('sorular').once('value').then(snap => {
-                const data = snap.val(); if(!data) return;
-                let html = "<div style='padding:20px; font-family:Arial, sans-serif;'><h2 style='text-align:center; color:#333; margin-bottom:15px; border-bottom:2px solid #ccc; padding-bottom:10px;'>TESİS-34 // MÜHİMMAT (SORU) ARŞİVİ</h2>";
-                for(let b=1; b<=7; b++){
-                    if(data[`bolge_${b}`]){
-                        html += `<h3 style='background:#1e293b; color:white; padding:10px; border-radius:5px; margin-top:20px; margin-bottom:15px; page-break-after:avoid;'>BÖLGE ${b} HEDEFLERİ</h3><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px;'>`;
-                        for(let s=1; s<=globalMaxSoru; s++){
-                             let soru = data[`bolge_${b}`][`soru_${s}`];
-                             if(soru) {
-                                 html += `<div style='background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1; page-break-inside:avoid;'><p style='margin-top:0; font-size:14px;'><b>Soru ${s}:</b> ${soru.soru_metni}</p>`;
-                                 if(soru.resim) html += `<div style='text-align:center;'><img src="${soru.resim}" style="max-width:100%; max-height:200px; margin:10px 0; border-radius:4px;"></div>`;
-                                 html += `<ul style='list-style:none; padding-left:0; font-size:13px; margin-bottom:10px;'><li style='margin-bottom:3px;'><b>A)</b> ${soru.secenekler.A}</li><li style='margin-bottom:3px;'><b>B)</b> ${soru.secenekler.B}</li><li style='margin-bottom:3px;'><b>C)</b> ${soru.secenekler.C}</li><li style='margin-bottom:3px;'><b>D)</b> ${soru.secenekler.D}</li><li><b>E)</b> ${soru.secenekler.E}</li></ul><p style='color:#16a34a; font-weight:bold; margin-bottom:0; font-size:13px;'>Doğru Cevap: ${soru.dogru_cevap}</p></div>`;
-                             }
-                        }
-                        html += `</div>`;
-                    }
-                }
-                html += "</div>";
-                const container = document.getElementById('pdf-container'); container.innerHTML = html; container.style.display = 'block'; 
-                renderMathInElement(container, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
-                const opt = { margin: [0.4, 0.4, 0.4, 0.4], filename: 'Tesis34_Soru_Arsivi.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
-                html2pdf().set(opt).from(container).save().then(() => { container.style.display = 'none'; });
-            });
         }
     </script>
 </body>
