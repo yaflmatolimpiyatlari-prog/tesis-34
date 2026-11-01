@@ -80,7 +80,6 @@
                 <button onclick="kapasiteVeModAyarla()" class="bg-cyan-700 hover:bg-cyan-600 text-white text-[10px] font-bold px-2 py-2 rounded mt-1">MODU & KAPASİTEYİ UYGULA (Sistemi Sıfırlar)</button>
             </div>
 
-            <!-- TOPLU RESİM YÜKLEME -->
             <div class="bg-purple-900/30 p-3 rounded border border-purple-700 shadow-lg flex flex-col gap-2">
                 <h3 class="text-[11px] text-purple-400 font-bold mb-0.5">📂 ÇOKLU RESİM (ARŞİV) DAĞITIMI</h3>
                 <p class="text-[9px] text-purple-300 mb-2">Dosya isminin sonuna <strong class="text-white">_A, -B</strong> eklerseniz (Örn: <span class="italic text-yellow-200">soru1_C.jpg</span>) cevap otomatik kodlanır.</p>
@@ -97,7 +96,6 @@
                 <div id="bulk_status" class="text-[10px] text-center text-purple-300 hidden">Yükleniyor, lütfen bekleyin...</div>
             </div>
 
-            <!-- TEKİL MÜHİMMAT YÜKLEME -->
             <div class="bg-slate-800 p-4 rounded border border-slate-600 shadow-lg flex-grow flex flex-col">
                 <h2 class="text-sm mb-2 text-yellow-400 font-bold flex justify-between items-center border-b border-slate-700 pb-2">
                     <span>🚀 Tekil Mühimmat Düzenle</span>
@@ -208,7 +206,6 @@
             }
         }
 
-        // --- CROPPER (KIRPMA) YÖNETİMİ ---
         function resimSecildi(event) {
             const file = event.target.files[0]; if(!file) return;
             const reader = new FileReader();
@@ -232,7 +229,6 @@
             updatePreview(); cropCancel();
         }
 
-        // --- TOPLU (ARŞİV) RESİM YÜKLEME ---
         async function topluResimYukle() {
             const files = document.getElementById('bulk_input').files;
             if(files.length === 0) { alert("Resim seçmediniz!"); return; }
@@ -312,7 +308,7 @@
                 keys.sort(() => Math.random() - 0.5); let takimIndex = 1; let updates = {};
                 
                 keys.forEach(k => { 
-                    if(globalOyunModu === "bireysel") { updates[`${k}/takim`] = 5; updates[`${k}/durum`] = "aktif"; }
+                    if(globalOyunModu === "bireysel") { updates[`${k}/takim`] = 5; updates[`${k}/durum`] = "aktif"; } 
                     else { updates[`${k}/takim`] = takimIndex; updates[`${k}/durum`] = "aktif"; takimIndex++; if(takimIndex > 4) takimIndex = 1; }
                 });
                 db.ref('lobi').update(updates).then(() => { alert(globalOyunModu === "bireysel" ? "Savaşçılar onaylandı!" : "Takımlar eşit dağıtıldı!"); });
