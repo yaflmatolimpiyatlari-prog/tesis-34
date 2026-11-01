@@ -16,7 +16,12 @@
         .fire-flash { animation: flash-red 0.5s ease-out; }
         
         @keyframes flash-red { 0% { background-color: #ef4444; } 100% { background-color: #0f172a; } }
-        @keyframes pulse-aktif { 0% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } 50% { border-color: #fca5a5; box-shadow: 0 0 25px rgba(239, 68, 68, 1); } 100% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } }
+        /* YENİ: Aktif Cephe Yanıp Sönme (Pulse) Animasyonu */
+        @keyframes pulse-aktif { 
+            0% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } 
+            50% { border-color: #fca5a5; box-shadow: 0 0 25px rgba(239, 68, 68, 1); } 
+            100% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } 
+        }
         
         .map-container { position: relative; width: 100%; aspect-ratio: 4/5; background: #020617; border-radius: 10px; overflow: hidden; border: 1px solid #334155; }
         .map-zone { position: absolute; background: #1e293b; border: 2px solid #475569; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.5s ease; cursor: pointer; }
@@ -175,6 +180,7 @@
         let geciciBolgelerData = {};
         db.ref('harita_durumu/bolgeler').on('value', snapshot => { geciciBolgelerData = snapshot.val() || {}; haritayiCiz(); });
 
+        // YENİ: DÜZELTİLMİŞ RENK VE ANİMASYON MOTORU
         function haritayiCiz() {
             let activeColor = myCustomColor; 
             if(globalOyunModu !== "bireysel") {
@@ -195,17 +201,20 @@
                 btn.classList.remove('zone-conquered', 'aktif-cephe');
 
                 if(i < benimAktifBolgem) {
-                    isimDiv.innerText = `TAMAMLANDI`; btn.classList.add('zone-conquered');
-                    btn.style.background = 'none'; btn.style.backgroundColor = activeColor; 
-                    btn.style.border = "2px solid #cbd5e1"; btn.style.boxShadow = `0 0 15px ${activeColor}80`;
+                    isimDiv.innerText = `TAMAMLANDI`; 
+                    btn.classList.add('zone-conquered');
+                    btn.style.background = activeColor; // TAMAMEN DOLU
+                    btn.style.border = "2px solid #cbd5e1"; 
+                    btn.style.boxShadow = "none";
                 } else if(i === benimAktifBolgem && isSavasBasladi) {
                     isimDiv.innerText = `CEPHE (%${Math.round(pct)})`;
-                    btn.classList.add('aktif-cephe'); // YENİ EKLENEN ANİMASYON SINIFI
-                    btn.style.backgroundImage = `linear-gradient(to top, ${activeColor} ${pct}%, #0f172a ${pct}%)`;
+                    btn.classList.add('aktif-cephe'); // CSS İLE YANIP SÖNER
+                    btn.style.background = `linear-gradient(to top, ${activeColor} ${pct}%, #0f172a ${pct}%)`;
                 } else {
                     isimDiv.innerText = `KİLİTLİ`; 
-                    btn.style.background = 'none'; btn.style.backgroundColor = '#0f172a'; 
-                    btn.style.border = "2px solid #334155"; btn.style.boxShadow = "none"; 
+                    btn.style.background = '#0f172a'; // SİYAH KİLİTLİ EKRAN
+                    btn.style.border = "2px solid #334155"; 
+                    btn.style.boxShadow = "none"; 
                 }
             }
         }
@@ -223,13 +232,7 @@
 
             aktifAtisSoruNo = siradakiSoru; seciliBolge = bolgeNo;
             
-            let activeColor = myCustomColor; 
-            if(globalOyunModu !== "bireysel") { if(benimTakim == 1) activeColor = '#3b82f6'; if(benimTakim == 2) activeColor = '#22c55e'; if(benimTakim == 3) activeColor = '#a855f7'; if(benimTakim == 4) activeColor = '#f97316'; }
-            
-            let btnBolge = document.getElementById(`btn-bolge-${bolgeNo}`);
-            btnBolge.classList.add('hedef-secili'); 
-            btnBolge.style.boxShadow = `0 0 25px ${activeColor}`;
-
+            document.getElementById(`btn-bolge-${bolgeNo}`).classList.add('hedef-secili'); 
             document.getElementById('secili-bolge-no').innerText = bolgeNo; document.getElementById('aktif-soru-no').innerText = aktifAtisSoruNo;
             document.getElementById('gorev-alani').classList.remove('hidden'); document.getElementById('gorev-alani').classList.add('flex'); document.getElementById('soru-kutusu').innerHTML = `<p class="text-slate-400 animate-pulse">Soru çekiliyor...</p>`;
             
